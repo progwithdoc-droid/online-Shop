@@ -57,19 +57,19 @@ export default function VendorDashboard() {
     <div className="space-y-8">
       {/* Verification Status Alert */}
       {!isVerified ? (
-        <div className="p-4 bg-amber-50 dark:bg-amber-950/20 text-amber-800 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50 rounded-2xl flex items-center space-x-3 shadow-sm">
-          <AlertTriangle className="w-6 h-6 shrink-0 text-amber-600" />
+        <div className="p-4 bg-warning-bg text-warning-text border border-warning-text/20 rounded-2xl flex items-center space-x-3 shadow-sm">
+          <AlertTriangle className="w-6 h-6 shrink-0" />
           <div>
             <span className="font-bold text-sm">Account Pending Verification</span>
-            <p className="text-xs text-amber-700 dark:text-amber-500 mt-0.5">Your profile is currently under review by administrators. You can create products, but they will not be public until verified.</p>
+            <p className="text-xs opacity-90 mt-0.5">Your profile is currently under review by administrators. You can create products, but they will not be public until verified.</p>
           </div>
         </div>
       ) : (
-        <div className="p-4 bg-green-50 dark:bg-green-950/20 text-green-800 dark:text-green-400 border border-green-200 dark:border-green-900/50 rounded-2xl flex items-center space-x-3 shadow-sm">
-          <CheckCircle className="w-6 h-6 shrink-0 text-green-600" />
+        <div className="p-4 bg-success-bg text-success-text border border-success-text/20 rounded-2xl flex items-center space-x-3 shadow-sm">
+          <CheckCircle className="w-6 h-6 shrink-0" />
           <div>
             <span className="font-bold text-sm">Account Verified</span>
-            <p className="text-xs text-green-700 dark:text-green-500 mt-0.5">Your business is verified. Your products are active and purchasable on the store.</p>
+            <p className="text-xs opacity-90 mt-0.5">Your business is verified. Your products are active and purchasable on the store.</p>
           </div>
         </div>
       )}
@@ -159,8 +159,8 @@ export default function VendorDashboard() {
                       <td className="py-4 font-bold text-slate-800 dark:text-slate-100">{formatCurrency(parseFloat(ord.price) * ord.quantity)}</td>
                       <td className="py-4">
                         <div className="flex items-center space-x-2">
-                          <span className={`inline-flex px-2 py-0.5 rounded-full text-[9px] font-bold ${
-                            ord.status === 'DELIVERED' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'
+                          <span className={`inline-flex px-2 py-0.5 rounded-full text-[9px] font-bold border ${
+                            ord.status === 'DELIVERED' ? 'bg-success-bg text-success-text border-success-text/20' : 'bg-warning-bg text-warning-text border-warning-text/20'
                           }`}>
                             {ord.status}
                           </span>
@@ -202,12 +202,12 @@ export default function VendorDashboard() {
           ) : (
             <div className="space-y-3">
               {lowStockProducts?.map((p) => (
-                <div key={p.id} className="p-3 bg-amber-50/20 dark:bg-amber-950/10 border border-amber-300 dark:border-amber-900/30 rounded-xl flex justify-between items-center text-xs">
+                <div key={p.id} className="p-3 bg-warning-bg/30 text-warning-text border border-warning-text/20 rounded-xl flex justify-between items-center text-xs">
                   <div>
                     <span className="font-bold text-slate-800 dark:text-slate-200 block truncate max-w-[150px]">{p.name}</span>
-                    <span className="text-[10px] text-slate-400">SKU: {p.sku || 'N/A'}</span>
+                    <span className="text-[10px] opacity-70">SKU: {p.sku || 'N/A'}</span>
                   </div>
-                  <span className="px-2 py-0.5 bg-red-100 text-red-800 font-bold rounded">
+                  <span className="px-2 py-0.5 bg-danger-bg text-danger-text font-bold rounded border border-danger-text/20">
                     Stock: {p.stock}
                   </span>
                 </div>

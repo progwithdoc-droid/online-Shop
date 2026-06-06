@@ -96,7 +96,7 @@ export default function AdminUsers() {
                     <td className="py-4">{u.email}</td>
                     <td className="py-4">
                       <span className={`inline-flex px-2 py-0.5 rounded-full text-[9px] font-bold ${
-                        u.role === 'ADMIN' ? 'bg-red-50 text-red-750' : u.role === 'VENDOR' ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-700'
+                        u.role === 'ADMIN' ? 'bg-danger-bg text-danger-text' : u.role === 'VENDOR' ? 'bg-warning-bg text-warning-text' : 'bg-info-bg text-info-text'
                       }`}>
                         {u.role}
                       </span>
@@ -104,7 +104,7 @@ export default function AdminUsers() {
                     <td className="py-4">{formatDate(u.createdAt)}</td>
                     <td className="py-4">
                       <span className={`inline-flex px-2 py-0.5 rounded-full text-[9px] font-bold border ${
-                        u.isActive ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'
+                        u.isActive ? 'bg-success-bg text-success-text border-success-text/20' : 'bg-danger-bg text-danger-text border-danger-text/20'
                       }`}>
                         {u.isActive ? 'ACTIVE' : 'BLOCKED'}
                       </span>

@@ -234,8 +234,10 @@ export default function VendorProducts() {
                   />
                   
                   {/* Status Indicator */}
-                  <span className={`absolute top-3 left-3 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
-                    product.isActive ? 'bg-green-100 text-green-800' : 'bg-red-105 text-red-800'
+                  <span className={`absolute top-3 left-3 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${
+                    product.isActive 
+                      ? 'bg-success-bg text-success-text border-success-text/20' 
+                      : 'bg-danger-bg text-danger-text border-danger-text/20'
                   }`}>
                     {product.isActive ? 'Active' : 'Draft'}
                   </span>

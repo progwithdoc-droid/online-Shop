@@ -100,7 +100,7 @@ export default function AdminDashboard() {
             <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Verified Vendors</span>
             <span className="text-xl font-black text-slate-855 dark:text-slate-100">{stats?.totalVendors || 0}</span>
           </div>
-          <div className="p-3 bg-green-50 dark:bg-green-950/20 rounded-xl text-green-600">
+          <div className="p-3 bg-success-bg rounded-xl text-success-text border border-success-text/10">
             <Landmark className="w-5 h-5" />
           </div>
         </div>
@@ -110,7 +110,7 @@ export default function AdminDashboard() {
             <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Open Complaints</span>
             <span className="text-xl font-black text-slate-855 dark:text-slate-100">{stats?.openComplaints || 0}</span>
           </div>
-          <div className="p-3 bg-red-50 dark:bg-red-950/20 rounded-xl text-red-650">
+          <div className="p-3 bg-danger-bg rounded-xl text-danger-text border border-danger-text/10">
             <AlertTriangle className="w-5 h-5" />
           </div>
         </div>
@@ -194,7 +194,7 @@ export default function AdminDashboard() {
                   <p className="text-slate-500 text-[11px] line-clamp-1 mt-1">{comp.body}</p>
                   
                   <div className="flex justify-between items-center mt-2">
-                    <span className="text-[9px] font-bold uppercase px-2 py-0.5 rounded bg-amber-50 text-amber-705 border">
+                    <span className="text-[9px] font-bold uppercase px-2 py-0.5 rounded bg-warning-bg text-warning-text border border-warning-text/20">
                       {comp.status}
                     </span>
                     <span className="text-[10px] text-slate-400">Against Vendor ID: {comp.vendorId || 'Admin'}</span>

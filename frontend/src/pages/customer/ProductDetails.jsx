@@ -229,7 +229,7 @@ export default function ProductDetails() {
               </div>
               <div className="flex items-center space-x-2">
                 <RefreshCw className="w-4 h-4 text-brand-500" />
-                <span>Stock Left: {isOutOfStock ? 'Out of stock' : `${product.stock} units`}</span>
+                <span>Stock Left: <span className={isOutOfStock ? 'text-danger-text font-bold' : 'text-success-text font-bold'}>{isOutOfStock ? 'Out of stock' : `${product.stock} units`}</span></span>
               </div>
             </div>
           </div>
@@ -278,7 +278,7 @@ export default function ProductDetails() {
           )}
 
           {isOutOfStock && (
-            <div className="p-3 bg-red-50 dark:bg-red-950/20 text-red-650 dark:text-red-400 border border-red-200 dark:border-red-900/50 rounded-xl font-bold text-center">
+            <div className="p-3 bg-danger-bg text-danger-text border border-danger-text/20 rounded-xl font-bold text-center">
               Currently Out of Stock
             </div>
           )}

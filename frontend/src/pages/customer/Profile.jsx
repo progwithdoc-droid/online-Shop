@@ -163,7 +163,7 @@ export default function Profile() {
               <div className="text-center sm:text-left space-y-1">
                 <h3 className="font-bold text-slate-800 dark:text-slate-200">{user?.name}</h3>
                 <p className="text-xs text-slate-400">{user?.email}</p>
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-brand-50 text-brand-700 border border-brand-200 mt-1.5">
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-info-bg text-info-text border border-info-text/20 mt-1.5">
                   Role: {user?.role}
                 </span>
               </div>
@@ -231,7 +231,7 @@ export default function Profile() {
                             {addr.label}
                           </span>
                           {addr.isDefault && (
-                            <span className="text-[9px] font-bold text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded">Default</span>
+                            <span className="text-[9px] font-bold text-success-text bg-success-bg px-1.5 py-0.5 rounded border border-success-text/20">Default</span>
                           )}
                         </div>
                         <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">

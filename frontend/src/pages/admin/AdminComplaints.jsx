@@ -64,11 +64,11 @@ export default function AdminComplaints() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'OPEN': return 'bg-red-50 text-red-700 border-red-200';
-      case 'IN_REVIEW': return 'bg-amber-50 text-amber-705 border-amber-300';
-      case 'RESOLVED': return 'bg-green-50 text-green-705 border-green-200';
-      case 'CLOSED': return 'bg-slate-100 text-slate-700 border-slate-200';
-      default: return 'bg-slate-50 text-slate-700 border-slate-200';
+      case 'OPEN': return 'bg-danger-bg text-danger-text border-danger-text/20';
+      case 'IN_REVIEW': return 'bg-warning-bg text-warning-text border-warning-text/20';
+      case 'RESOLVED': return 'bg-success-bg text-success-text border-success-text/20';
+      case 'CLOSED': return 'bg-slate-100 dark:bg-dark-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700';
+      default: return 'bg-slate-50 dark:bg-dark-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800';
     }
   };
 

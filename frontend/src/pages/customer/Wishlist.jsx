@@ -103,11 +103,17 @@ export default function Wishlist() {
               <div className="aspect-square w-full bg-slate-50 dark:bg-dark-950 overflow-hidden relative">
                 <Link to={`/product/${product.id}`}>
                   <img
-                    src={primaryMedia.startsWith('http') ? primaryMedia : `${import.meta.env.VITE_API_URL.replace('/api', '')}${primaryMedia}`}
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </Link>
+                      src={primaryMedia.startsWith('http') ? primaryMedia : `${import.meta.env.VITE_API_URL.replace('/api', '')}${primaryMedia}`}
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </Link>
+                  
+                  {isOutOfStock && (
+                    <div className="absolute inset-0 bg-white/40 dark:bg-dark-900/40 backdrop-blur-[1px] flex items-center justify-center">
+                      <span className="px-3 py-1 bg-danger-bg text-danger-text text-[10px] font-bold uppercase rounded-full border border-danger-text/20 shadow-sm">Out of Stock</span>
+                    </div>
+                  )}
                 
                 {/* Trash option */}
                 <button

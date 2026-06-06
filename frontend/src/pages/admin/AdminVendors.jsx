@@ -98,8 +98,8 @@ export default function AdminVendors() {
                     <td className="py-4">
                       <span className={`inline-flex px-2 py-0.5 rounded-full text-[9px] font-bold border ${
                         vp.isVerified 
-                          ? 'bg-green-50 text-green-700 border-green-200' 
-                          : 'bg-amber-50 text-amber-700 border-amber-200'
+                          ? 'bg-success-bg text-success-text border-success-text/20' 
+                          : 'bg-warning-bg text-warning-text border-warning-text/20'
                       }`}>
                         {vp.isVerified ? 'VERIFIED' : 'PENDING'}
                       </span>

@@ -171,7 +171,7 @@ export default function Cart() {
               </div>
               <div className="flex justify-between text-slate-500">
                 <span>Shipping</span>
-                <span className="text-green-500 font-semibold">Free</span>
+                <span className="text-success-text font-bold">Free</span>
               </div>
             </div>
 

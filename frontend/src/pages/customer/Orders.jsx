@@ -120,13 +120,13 @@ export default function Orders() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'PENDING': return 'bg-amber-100 text-amber-800 border-amber-300';
-      case 'CONFIRMED': return 'bg-blue-105 text-blue-800 border-blue-200';
-      case 'PROCESSING': return 'bg-indigo-100 text-indigo-800 border-indigo-200';
-      case 'SHIPPED': return 'bg-purple-100 text-purple-800 border-purple-200';
-      case 'DELIVERED': return 'bg-green-100 text-green-800 border-green-200';
-      case 'CANCELLED': return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-slate-100 text-slate-800 border-slate-200';
+      case 'PENDING': return 'bg-warning-bg text-warning-text border-warning-text/20';
+      case 'CONFIRMED': return 'bg-info-bg text-info-text border-info-text/20';
+      case 'PROCESSING': return 'bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 border-brand-200 dark:border-brand-800/30';
+      case 'SHIPPED': return 'bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800/30';
+      case 'DELIVERED': return 'bg-success-bg text-success-text border-success-text/20';
+      case 'CANCELLED': return 'bg-danger-bg text-danger-text border-danger-text/20';
+      default: return 'bg-slate-100 dark:bg-dark-800 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700';
     }
   };
 
