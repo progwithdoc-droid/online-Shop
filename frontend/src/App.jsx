@@ -8,6 +8,7 @@ import RoleRoute from './components/layout/RoleRoute.jsx';
 import Login from './pages/auth/Login.jsx';
 import Register from './pages/auth/Register.jsx';
 import VendorRegister from './pages/auth/VendorRegister.jsx';
+import VendorLogin from './pages/auth/VendorLogin.jsx';
 
 // Customer Pages
 import Home from './pages/customer/Home.jsx';
@@ -53,11 +54,16 @@ function App() {
       <Layout>
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={
+            role === 'VENDOR' ? <Navigate to="/vendor/dashboard" replace /> :
+            role === 'ADMIN' ? <Navigate to="/admin/dashboard" replace /> :
+            <Home />
+          } />
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <Login />} />
           <Route path="/register" element={isAuthenticated ? <Navigate to="/" replace /> : <Register />} />
-          <Route path="/vendor-register" element={role === 'VENDOR' ? <Navigate to="/vendor/dashboard" replace /> : <VendorRegister />} />
+          <Route path="/vendor/login" element={role === 'VENDOR' ? <Navigate to="/vendor/dashboard" replace /> : <VendorLogin />} />
+          <Route path="/vendor/register" element={role === 'VENDOR' ? <Navigate to="/vendor/dashboard" replace /> : <VendorRegister />} />
           
           {/* Protected Customer Routes */}
           <Route path="/cart" element={

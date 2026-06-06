@@ -20,7 +20,7 @@ export default function Home() {
   const [totalPages, setTotalPages] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
 
-  const { isAuthenticated, role } = useAuthStore();
+  const { isAuthenticated, role, user } = useAuthStore();
   const fetchCart = useCartStore((state) => state.fetchCart);
 
   const categories = [
@@ -106,23 +106,138 @@ export default function Home() {
     }
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 18) return 'Good Afternoon';
+    return 'Good Evening';
+  };
+
   return (
     <div className="space-y-8">
       {/* Hero Banner Section */}
-      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-brand-600 to-indigo-600 dark:from-brand-900 dark:to-indigo-950 px-6 py-12 md:py-20 text-white shadow-xl">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
-        <div className="relative max-w-2xl space-y-4">
-          <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold uppercase tracking-wider">
-            Phase 1 Live
-          </span>
-          <h1 className="heading-display text-4xl md:text-6xl font-extrabold leading-tight">
-            Next-Gen E-Commerce for Fast Growth
-          </h1>
-          <p className="text-slate-200 text-sm md:text-lg">
-            Shop premium electronics, high-grade home essentials, and modern fashion crafted by verified vendors worldwide.
-          </p>
+      {isAuthenticated && role === 'USER' ? (
+        /* Logged-in Customer personalized space */
+        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-brand-700 via-indigo-900 to-slate-900 px-6 py-8 sm:px-8 sm:py-12 md:py-16 text-white shadow-2xl transition-all duration-300">
+          {/* Modern Mesh Gradient Overlay */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.15),transparent_45%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(99,102,241,0.2),transparent_50%)]" />
+          <div className="absolute inset-0 opacity-5 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:24px_24px]"></div>
+          
+          <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-center z-10">
+            <div className="lg:col-span-7 space-y-5">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white/10 backdrop-blur-md border border-white/10 text-brand-200">
+                ✨ Personalized Hub
+              </span>
+              <div className="space-y-2">
+                <h1 className="heading-display text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight tracking-tight">
+                  {getGreeting()}, <span className="bg-gradient-to-r from-amber-400 to-amber-200 bg-clip-text text-transparent">{user?.name || 'Customer'}</span>
+                </h1>
+                <p className="text-slate-200 text-sm md:text-base max-w-xl leading-relaxed">
+                  Welcome back to your premium shopping experience. Explore new arrivals, track your pending orders, or manage your wishlist items.
+                </p>
+              </div>
+              
+              {/* Quick actions */}
+              <div className="flex flex-wrap gap-3 pt-2">
+                <Link to="/orders" className="px-5 py-2.5 bg-white text-brand-700 hover:bg-slate-100 font-bold rounded-xl text-sm transition-all shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] cursor-pointer">
+                  Track Orders
+                </Link>
+                <Link to="/wishlist" className="px-5 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold rounded-xl text-sm transition-all backdrop-blur-sm cursor-pointer">
+                  My Wishlist
+                </Link>
+              </div>
+            </div>
+            
+            {/* Decorative Premium Dashboard Card on the right */}
+            <div className="lg:col-span-5 hidden lg:block">
+              <div className="bg-slate-900/40 border border-white/10 backdrop-blur-lg p-6 rounded-2xl shadow-inner space-y-4 relative overflow-hidden group hover:border-white/20 transition-all">
+                {/* Glow */}
+                <div className="absolute -right-10 -bottom-10 w-24 h-24 bg-amber-500/20 rounded-full blur-2xl pointer-events-none group-hover:scale-150 transition-all duration-500"></div>
+                
+                <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                  <span className="text-xs font-semibold text-slate-400">Account Summary</span>
+                  <span className="h-2 w-2 rounded-full bg-green-400 animate-ping"></span>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-slate-300">Status</span>
+                    <span className="font-semibold text-amber-300">Verified Client</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-slate-300">Email</span>
+                    <span className="font-medium text-slate-200 truncate max-w-[180px]">{user?.email}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-slate-300">Shopping Tier</span>
+                    <span className="font-bold bg-gradient-to-r from-amber-400 to-indigo-300 bg-clip-text text-transparent">Gold Member</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      ) : (
+        /* Unauthenticated Guest Landing Hero */
+        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-brand-600 via-indigo-900 to-slate-900 px-6 py-10 sm:px-10 sm:py-16 md:py-20 text-white shadow-2xl">
+          {/* Abstract decorative floating blobs */}
+          <div className="absolute top-1/4 right-1/4 w-72 h-72 bg-brand-400/15 rounded-full blur-3xl pointer-events-none animate-pulse"></div>
+          <div className="absolute bottom-1/4 left-10 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px]"></div>
+          
+          <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-center z-10">
+            <div className="lg:col-span-8 space-y-6">
+              <span className="inline-flex items-center px-3.5 py-1 rounded-full text-xs font-bold bg-white/10 backdrop-blur-md border border-white/15 text-indigo-200">
+                🚀 Platform V2 Live
+              </span>
+              <h1 className="heading-display text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight tracking-tight">
+                Next-Gen E-Commerce <br />
+                <span className="bg-gradient-to-r from-amber-400 via-amber-300 to-indigo-300 bg-clip-text text-transparent">For Fast Growth</span>
+              </h1>
+              <p className="text-slate-200 text-sm md:text-lg max-w-xl leading-relaxed">
+                Discover premium products verified by top vendors worldwide. Experience seamless browsing, lightning-fast ordering, and secure remittances.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                <Link
+                  to="/register"
+                  className="px-8 py-3.5 bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 text-white font-bold rounded-xl text-center shadow-lg hover:shadow-indigo-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer text-sm sm:text-base animate-pulse"
+                >
+                  Get Started
+                </Link>
+                <Link
+                  to="/login"
+                  className="px-8 py-3.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold rounded-xl text-center backdrop-blur-sm hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer text-sm sm:text-base"
+                >
+                  Sign In
+                </Link>
+              </div>
+            </div>
+            
+            {/* Visual Card component on the right */}
+            <div className="lg:col-span-4 hidden lg:block">
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-slate-900/50 backdrop-blur-md p-6 space-y-4">
+                <div className="flex items-center space-x-2">
+                  <div className="h-2 w-2 rounded-full bg-red-400"></div>
+                  <div className="h-2 w-2 rounded-full bg-yellow-400"></div>
+                  <div className="h-2 w-2 rounded-full bg-green-400"></div>
+                </div>
+                <div className="space-y-2">
+                  <div className="h-4 w-2/3 bg-white/10 rounded-md"></div>
+                  <div className="h-10 w-full bg-white/5 rounded-md flex items-center px-3 justify-between">
+                    <span className="text-[10px] text-slate-400 font-mono">REMOTE_SECURE_PAY</span>
+                    <span className="text-[10px] text-green-400 font-semibold">Active</span>
+                  </div>
+                  <div className="h-24 w-full bg-gradient-to-br from-indigo-500/10 to-brand-500/20 rounded-md flex items-center justify-center border border-white/5">
+                    <span className="text-xs font-mono text-indigo-200">sparkit-secure-v2</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Filter and search panel */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -146,7 +261,7 @@ export default function Home() {
             onClick={() => setShowFilters(!showFilters)}
             className={`flex items-center space-x-2 px-4 py-2.5 border rounded-xl text-sm font-semibold transition-all ${
               showFilters 
-                ? 'bg-brand-50 text-brand-600 border-brand-200 dark:bg-brand-950/20 dark:text-brand-400 dark:border-brand-900' 
+                ? 'bg-brand-50 text-brand-600 border-brand-200 dark:bg-brand-900/20 dark:text-brand-400 dark:border-brand-900' 
                 : 'bg-white dark:bg-dark-900 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-800'
             }`}
           >
@@ -169,7 +284,7 @@ export default function Home() {
 
       {/* Expanded Filters */}
       {showFilters && (
-        <div className="p-6 bg-white dark:bg-dark-900 rounded-2xl border border-slate-200 dark:border-slate-800 grid grid-cols-1 md:grid-cols-4 gap-6 animate-fade-in shadow-sm">
+        <div className="p-6 bg-white dark:bg-dark-900 rounded-2xl border border-slate-200 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 animate-fade-in shadow-sm">
           {/* Categories */}
           <div>
             <span className="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Category</span>
@@ -180,7 +295,7 @@ export default function Home() {
                   onClick={() => { setCategory(cat.slug); setPage(1); }}
                   className={`text-left px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                     category === cat.slug
-                      ? 'bg-brand-50 text-brand-700 dark:bg-brand-950/30 dark:text-brand-400'
+                      ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400'
                       : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-dark-800'
                   }`}
                 >
@@ -267,13 +382,13 @@ export default function Home() {
             return (
               <div
                 key={product.id}
-                className="group relative flex flex-col bg-white dark:bg-dark-900 rounded-2xl border border-slate-200 dark:border-slate-850 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
+                className="group relative flex flex-col bg-white dark:bg-dark-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
               >
                 {/* Media Image container */}
                 <div className="aspect-square w-full bg-slate-50 dark:bg-dark-950 relative overflow-hidden">
                   <Link to={`/product/${product.id}`}>
                     <img
-                      src={primaryMedia.startsWith('http') ? primaryMedia : `http://localhost:5000${primaryMedia}`}
+                      src={primaryMedia.startsWith('http') ? primaryMedia : `${import.meta.env.VITE_API_URL.replace('/api', '')}${primaryMedia}`}
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
@@ -361,7 +476,7 @@ export default function Home() {
           >
             Previous
           </button>
-          <span className="text-sm font-medium text-slate-600 dark:text-slate-450">
+          <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
             Page {page} of {totalPages}
           </span>
           <button
@@ -371,6 +486,47 @@ export default function Home() {
           >
             Next
           </button>
+        </div>
+      )}
+
+      {/* Sell on SparkIT CTA Box */}
+      {!isAuthenticated && (
+        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-amber-500/10 via-brand-500/5 to-indigo-500/10 dark:from-amber-950/20 dark:via-brand-900/10 dark:to-indigo-950/20 border border-slate-200 dark:border-slate-800 p-8 sm:p-12 shadow-lg max-w-7xl mx-auto mt-12 transition-all hover:shadow-xl">
+          {/* Decorative elements */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+          
+          <div className="relative flex flex-col md:flex-row items-center justify-between gap-8 z-10">
+            <div className="space-y-4 text-center md:text-left max-w-xl">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950/30 dark:text-amber-400">
+                Grow Your Business
+              </span>
+              <h2 className="heading-display text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white leading-tight">
+                Sell on SparkIT Today!
+              </h2>
+              <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base leading-relaxed">
+                Reach thousands of customers worldwide. List your products on our next-gen platform with zero hassle, robust management tools, and instant verification.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto justify-center">
+              <Link
+                to="/vendor/register"
+                className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-amber-600 to-brand-600 hover:from-amber-700 hover:to-brand-700 text-white font-bold rounded-xl text-center shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+              >
+                Register as Vendor
+              </Link>
+              <div className="text-sm text-slate-500 dark:text-slate-400 text-center sm:text-left">
+                Already have a shop?{' '}
+                <Link
+                  to="/vendor/login"
+                  className="font-semibold text-amber-600 hover:underline dark:text-amber-400"
+                >
+                  Sign In
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

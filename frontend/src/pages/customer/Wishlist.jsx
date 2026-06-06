@@ -79,7 +79,7 @@ export default function Wishlist() {
   return (
     <div className="space-y-8">
       <div className="border-b pb-4">
-        <h1 className="heading-display text-3xl font-extrabold text-slate-850 dark:text-slate-100 flex items-center space-x-3">
+        <h1 className="heading-display text-3xl font-extrabold text-slate-800 dark:text-slate-100 flex items-center space-x-3">
           <Heart className="w-8 h-8 text-brand-600 dark:text-brand-500 fill-current" />
           <span>My Wishlist</span>
         </h1>
@@ -97,13 +97,13 @@ export default function Wishlist() {
           return (
             <div
               key={item.id}
-              className="flex flex-col bg-white dark:bg-dark-900 rounded-2xl border border-slate-200 dark:border-slate-850 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 relative group"
+              className="flex flex-col bg-white dark:bg-dark-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 relative group"
             >
               {/* Media Thumbnail */}
               <div className="aspect-square w-full bg-slate-50 dark:bg-dark-950 overflow-hidden relative">
                 <Link to={`/product/${product.id}`}>
                   <img
-                    src={primaryMedia.startsWith('http') ? primaryMedia : `http://localhost:5000${primaryMedia}`}
+                    src={primaryMedia.startsWith('http') ? primaryMedia : `${import.meta.env.VITE_API_URL.replace('/api', '')}${primaryMedia}`}
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
@@ -140,7 +140,7 @@ export default function Wishlist() {
                   <button
                     onClick={() => handleMoveToCart(product.id)}
                     disabled={isOutOfStock}
-                    className="flex items-center space-x-1.5 px-3 py-1.5 bg-brand-650 hover:bg-brand-700 disabled:bg-slate-200 dark:disabled:bg-dark-800 text-white disabled:text-slate-400 text-xs font-bold rounded-lg transition-colors cursor-pointer"
+                    className="flex items-center space-x-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 disabled:bg-slate-200 dark:disabled:bg-dark-800 text-white disabled:text-slate-400 text-xs font-bold rounded-lg transition-colors cursor-pointer"
                   >
                     <ShoppingCart className="w-3.5 h-3.5" />
                     <span>Move to Cart</span>

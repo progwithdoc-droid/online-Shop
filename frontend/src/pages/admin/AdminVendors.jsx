@@ -62,7 +62,7 @@ export default function AdminVendors() {
 
   return (
     <div className="space-y-8">
-      <h1 className="heading-display text-3xl font-extrabold text-slate-800 dark:text-slate-100 border-b pb-4">
+      <h1 className="heading-display text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-slate-100 border-b pb-4">
         Vendor Operations
       </h1>
 
@@ -82,9 +82,9 @@ export default function AdminVendors() {
                   <th className="pb-3">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-850">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {vendors.map((vp) => (
-                  <tr key={vp.id} className="text-slate-650 dark:text-slate-350">
+                  <tr key={vp.id} className="text-slate-600 dark:text-slate-400">
                     <td className="py-4">
                       <span className="font-bold text-slate-800 dark:text-slate-200 block">{vp.businessName}</span>
                       <span className="text-[10px] text-slate-400 block max-w-[200px] truncate">{vp.businessDescription}</span>

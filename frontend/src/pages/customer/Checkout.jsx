@@ -114,7 +114,7 @@ export default function Checkout() {
 
   return (
     <div className="space-y-8">
-      <h1 className="heading-display text-3xl font-extrabold text-slate-800 dark:text-slate-100 border-b pb-4">
+      <h1 className="heading-display text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-slate-100 border-b pb-4">
         Checkout
       </h1>
 
@@ -124,10 +124,10 @@ export default function Checkout() {
         <div className="lg:col-span-2 space-y-6">
           
           {/* Shipping Addresses Section */}
-          <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl space-y-4 shadow-sm">
+          <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-4 shadow-sm">
             <div className="flex justify-between items-center">
               <h2 className="heading-display text-lg font-bold flex items-center space-x-2">
-                <MapPin className="w-5 h-5 text-brand-650" />
+                <MapPin className="w-5 h-5 text-brand-600" />
                 <span>1. Shipping Address</span>
               </h2>
               <button
@@ -145,7 +145,7 @@ export default function Checkout() {
                 onSubmit={handleSubmit(handleAddNewAddress)}
                 className="p-4 bg-slate-50 dark:bg-dark-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-3 animate-fade-in"
               >
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <input
                       type="text"
@@ -185,7 +185,7 @@ export default function Checkout() {
                   />
                 </div>
 
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <input
                       type="text"
@@ -236,8 +236,8 @@ export default function Checkout() {
                     onClick={() => setSelectedAddressId(addr.id)}
                     className={`flex items-start p-4 border rounded-xl cursor-pointer transition-all ${
                       selectedAddressId === addr.id
-                        ? 'border-brand-600 bg-brand-50/20 dark:bg-brand-950/10'
-                        : 'border-slate-200 dark:border-slate-850 hover:bg-slate-50 dark:hover:bg-dark-850'
+                        ? 'border-brand-600 bg-brand-50/20 dark:bg-brand-900/10'
+                        : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-dark-850'
                     }`}
                   >
                     <input
@@ -257,7 +257,7 @@ export default function Checkout() {
                           <span className="text-[9px] font-bold text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded">Default</span>
                         )}
                       </div>
-                      <p className="text-xs text-slate-650 dark:text-slate-350 mt-1">
+                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
                         {addr.line1}, {addr.line2 && `${addr.line2}, `}{addr.city}, {addr.state} — {addr.pincode}, {addr.country}
                       </p>
                     </div>
@@ -268,9 +268,9 @@ export default function Checkout() {
           </div>
 
           {/* Payment Method section */}
-          <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl space-y-4 shadow-sm">
+          <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-4 shadow-sm">
             <h2 className="heading-display text-lg font-bold flex items-center space-x-2">
-              <CreditCard className="w-5 h-5 text-brand-650" />
+              <CreditCard className="w-5 h-5 text-brand-600" />
               <span>2. Payment Method</span>
             </h2>
 
@@ -280,8 +280,8 @@ export default function Checkout() {
                 onClick={() => setPaymentMethod('COD')}
                 className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all ${
                   paymentMethod === 'COD'
-                    ? 'border-brand-600 bg-brand-50/20 dark:bg-brand-950/10'
-                    : 'border-slate-200 dark:border-slate-850 hover:bg-slate-50'
+                    ? 'border-brand-600 bg-brand-50/20 dark:bg-brand-900/10'
+                    : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50'
                 }`}
               >
                 <input
@@ -306,8 +306,8 @@ export default function Checkout() {
                 onClick={() => setPaymentMethod('CARD')}
                 className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all ${
                   paymentMethod === 'CARD'
-                    ? 'border-brand-600 bg-brand-50/20 dark:bg-brand-950/10'
-                    : 'border-slate-200 dark:border-slate-850 hover:bg-slate-50'
+                    ? 'border-brand-600 bg-brand-50/20 dark:bg-brand-900/10'
+                    : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50'
                 }`}
               >
                 <input
@@ -332,13 +332,13 @@ export default function Checkout() {
 
         {/* Right Side: Order Summary Checkout */}
         <div>
-          <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl space-y-6 shadow-sm sticky top-24">
+          <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-6 shadow-sm lg:sticky lg:top-24">
             <h3 className="heading-display text-lg font-bold">Purchase Summary</h3>
             
             <div className="space-y-4 max-h-60 overflow-y-auto border-b pb-4">
               {items.map((item) => (
-                <div key={item.id} className="flex justify-between items-center text-xs text-slate-600">
-                  <div className="truncate max-w-[150px]">
+                <div key={item.id} className="flex justify-between items-center text-xs text-slate-600 gap-2">
+                  <div className="truncate w-full max-w-[150px] sm:max-w-none flex-1">
                     <span className="font-bold">{item.quantity}x</span> {item.product?.name}
                   </div>
                   <span className="font-semibold">{formatCurrency(parseFloat(item.product?.price) * item.quantity)}</span>
@@ -357,7 +357,7 @@ export default function Checkout() {
               </div>
             </div>
 
-            <div className="flex justify-between font-bold text-base text-slate-850 dark:text-slate-100">
+            <div className="flex justify-between font-bold text-base text-slate-800 dark:text-slate-100">
               <span>Total Amount</span>
               <span>{formatCurrency(cartTotal)}</span>
             </div>

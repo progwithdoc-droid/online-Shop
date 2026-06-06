@@ -28,7 +28,7 @@ export default function Orders() {
     setLoading(true);
     try {
       const response = await axiosInstance.get('/orders');
-      setOrders(response.data.data || []);
+      setOrders(response.data.data?.orders || []);
     } catch (err) {
       toast.error('Failed to load your orders');
     } finally {
@@ -120,7 +120,7 @@ export default function Orders() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'PENDING': return 'bg-amber-100 text-amber-800 border-amber-250';
+      case 'PENDING': return 'bg-amber-100 text-amber-800 border-amber-300';
       case 'CONFIRMED': return 'bg-blue-105 text-blue-800 border-blue-200';
       case 'PROCESSING': return 'bg-indigo-100 text-indigo-800 border-indigo-200';
       case 'SHIPPED': return 'bg-purple-100 text-purple-800 border-purple-200';
@@ -154,7 +154,7 @@ export default function Orders() {
 
   return (
     <div className="space-y-8">
-      <h1 className="heading-display text-3xl font-extrabold text-slate-800 dark:text-slate-100 border-b pb-4">
+      <h1 className="heading-display text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-slate-100 border-b pb-4">
         My Orders
       </h1>
 
@@ -168,22 +168,22 @@ export default function Orders() {
           return (
             <div
               key={order.id}
-              className="bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl overflow-hidden shadow-sm transition-all"
+              className="bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm transition-all"
             >
               {/* Header summary of order */}
               <div
                 onClick={() => toggleExpand(order.id)}
                 className="p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-dark-850 transition-colors"
               >
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 flex-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 flex-1">
                   <div>
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Order ID</span>
-                    <span className="text-xs font-semibold text-slate-750 dark:text-slate-300 truncate max-w-[120px] block">{order.id}</span>
+                    <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate w-[150px] sm:max-w-[120px] block" title={order.id}>{order.id}</span>
                   </div>
 
                   <div>
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Order Date</span>
-                    <span className="text-xs font-semibold text-slate-750 dark:text-slate-300 flex items-center">
+                    <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center">
                       <Calendar className="w-3.5 h-3.5 mr-1 text-slate-500" />
                       {formatDate(order.createdAt)}
                     </span>
@@ -255,15 +255,15 @@ export default function Orders() {
                         <div key={item.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-2 border-b last:border-0 gap-2">
                           <div className="flex items-center space-x-3">
                             <div className="w-10 h-10 rounded overflow-hidden bg-white border flex-shrink-0">
-                              <img src={primaryMedia.startsWith('http') ? primaryMedia : `http://localhost:5000${primaryMedia}`} alt="" className="w-full h-full object-cover" />
+                              <img src={primaryMedia.startsWith('http') ? primaryMedia : `${import.meta.env.VITE_API_URL.replace('/api', '')}${primaryMedia}`} alt="" className="w-full h-full object-cover" />
                             </div>
                             <div>
                               <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 block">{product.name}</span>
-                              <span className="text-[10px] text-slate-450">Quantity: {item.quantity} × {formatCurrency(item.price)}</span>
+                              <span className="text-[10px] text-slate-400">Quantity: {item.quantity} × {formatCurrency(item.price)}</span>
                             </div>
                           </div>
 
-                          <div className="flex items-center space-x-3 w-full sm:w-auto justify-end">
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end">
                             <span className="text-xs font-bold text-slate-800 dark:text-slate-100">{formatCurrency(parseFloat(item.price) * item.quantity)}</span>
                             
                             {/* Return state */}
@@ -286,7 +286,7 @@ export default function Orders() {
                             {canReturn && (
                               <button
                                 onClick={() => handleOpenReturn(order.id, item)}
-                                className="px-2.5 py-1 bg-amber-600 hover:bg-amber-750 text-white text-[10px] font-bold rounded flex items-center transition-colors cursor-pointer"
+                                className="px-2.5 py-1 bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold rounded flex items-center transition-colors cursor-pointer"
                               >
                                 <RefreshCcw className="w-3 h-3 mr-1" />
                                 Return

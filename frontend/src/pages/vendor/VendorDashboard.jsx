@@ -75,23 +75,23 @@ export default function VendorDashboard() {
       )}
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {/* Earnings */}
-        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl flex items-center justify-between shadow-sm">
+        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center justify-between shadow-sm">
           <div className="space-y-1">
             <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Total Earnings</span>
-            <span className="text-2xl font-black text-slate-850 dark:text-slate-100">{formatCurrency(stats?.earnings || 0)}</span>
+            <span className="text-2xl font-black text-slate-800 dark:text-slate-100">{formatCurrency(stats?.earnings || 0)}</span>
           </div>
-          <div className="p-3 bg-brand-50 dark:bg-brand-950/20 rounded-xl text-brand-650">
+          <div className="p-3 bg-brand-50 dark:bg-brand-900/20 rounded-xl text-brand-600">
             <DollarSign className="w-6 h-6" />
           </div>
         </div>
 
         {/* Orders */}
-        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl flex items-center justify-between shadow-sm">
+        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center justify-between shadow-sm">
           <div className="space-y-1">
             <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Orders Processed</span>
-            <span className="text-2xl font-black text-slate-850 dark:text-slate-100">{stats?.ordersCount || 0}</span>
+            <span className="text-2xl font-black text-slate-800 dark:text-slate-100">{stats?.ordersCount || 0}</span>
           </div>
           <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-xl text-blue-600">
             <ShoppingBag className="w-6 h-6" />
@@ -99,12 +99,12 @@ export default function VendorDashboard() {
         </div>
 
         {/* Products */}
-        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl flex items-center justify-between shadow-sm">
+        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center justify-between shadow-sm">
           <div className="space-y-1">
             <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Active Products</span>
-            <span className="text-2xl font-black text-slate-850 dark:text-slate-100">{stats?.productsCount || 0}</span>
+            <span className="text-2xl font-black text-slate-800 dark:text-slate-100">{stats?.productsCount || 0}</span>
           </div>
-          <div className="p-3 bg-indigo-50 dark:bg-indigo-950/20 rounded-xl text-indigo-650">
+          <div className="p-3 bg-indigo-50 dark:bg-indigo-950/20 rounded-xl text-indigo-600">
             <Landmark className="w-6 h-6" />
           </div>
         </div>
@@ -112,7 +112,7 @@ export default function VendorDashboard() {
 
       {/* Analytics Chart */}
       {salesTrend.length > 0 && (
-        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl shadow-sm">
+        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm">
           <h3 className="heading-display text-base font-bold mb-6">Earnings Timeline Trend</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -132,7 +132,7 @@ export default function VendorDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Manage Orders */}
-        <div className="lg:col-span-2 p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl space-y-4 shadow-sm">
+        <div className="lg:col-span-2 p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-4 shadow-sm">
           <h3 className="heading-display text-base font-bold">Recent Customer Orders</h3>
           
           {recentOrders?.length === 0 ? (
@@ -148,13 +148,13 @@ export default function VendorDashboard() {
                     <th className="pb-3">Status Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-850">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {recentOrders?.map((ord) => (
-                    <tr key={ord.id} className="text-slate-650 dark:text-slate-350">
+                    <tr key={ord.id} className="text-slate-600 dark:text-slate-400">
                       <td className="py-4 font-mono font-medium truncate max-w-[80px]">{ord.id}</td>
                       <td className="py-4">
                         <span className="font-bold text-slate-800 dark:text-slate-200 block">{ord.product?.name}</span>
-                        <span className="text-[10px] text-slate-450">{ord.quantity} units ordered</span>
+                        <span className="text-[10px] text-slate-400">{ord.quantity} units ordered</span>
                       </td>
                       <td className="py-4 font-bold text-slate-800 dark:text-slate-100">{formatCurrency(parseFloat(ord.price) * ord.quantity)}</td>
                       <td className="py-4">
@@ -191,7 +191,7 @@ export default function VendorDashboard() {
         </div>
 
         {/* Low Stock Warnings */}
-        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl space-y-4 shadow-sm">
+        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-4 shadow-sm">
           <h3 className="heading-display text-base font-bold flex items-center space-x-2 text-amber-600">
             <AlertTriangle className="w-5 h-5" />
             <span>Low Stock Alerts</span>
@@ -202,10 +202,10 @@ export default function VendorDashboard() {
           ) : (
             <div className="space-y-3">
               {lowStockProducts?.map((p) => (
-                <div key={p.id} className="p-3 bg-amber-50/20 dark:bg-amber-950/10 border border-amber-250 dark:border-amber-900/30 rounded-xl flex justify-between items-center text-xs">
+                <div key={p.id} className="p-3 bg-amber-50/20 dark:bg-amber-950/10 border border-amber-300 dark:border-amber-900/30 rounded-xl flex justify-between items-center text-xs">
                   <div>
                     <span className="font-bold text-slate-800 dark:text-slate-200 block truncate max-w-[150px]">{p.name}</span>
-                    <span className="text-[10px] text-slate-450">SKU: {p.sku || 'N/A'}</span>
+                    <span className="text-[10px] text-slate-400">SKU: {p.sku || 'N/A'}</span>
                   </div>
                   <span className="px-2 py-0.5 bg-red-100 text-red-800 font-bold rounded">
                     Stock: {p.stock}

@@ -70,7 +70,7 @@ export default function AdminUsers() {
 
   return (
     <div className="space-y-8">
-      <h1 className="heading-display text-3xl font-extrabold text-slate-800 dark:text-slate-100 border-b pb-4">
+      <h1 className="heading-display text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-slate-100 border-b pb-4">
         User Operations
       </h1>
 
@@ -89,14 +89,14 @@ export default function AdminUsers() {
                   <th className="pb-3">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-850">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {users.map((u) => (
-                  <tr key={u.id} className="text-slate-655 dark:text-slate-350">
+                  <tr key={u.id} className="text-slate-600 dark:text-slate-400">
                     <td className="py-4 font-bold text-slate-800 dark:text-slate-200">{u.name}</td>
                     <td className="py-4">{u.email}</td>
                     <td className="py-4">
                       <span className={`inline-flex px-2 py-0.5 rounded-full text-[9px] font-bold ${
-                        u.role === 'ADMIN' ? 'bg-red-50 text-red-750' : u.role === 'VENDOR' ? 'bg-amber-50 text-amber-750' : 'bg-slate-100 text-slate-700'
+                        u.role === 'ADMIN' ? 'bg-red-50 text-red-750' : u.role === 'VENDOR' ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-700'
                       }`}>
                         {u.role}
                       </span>
@@ -141,7 +141,7 @@ export default function AdminUsers() {
           {editingUser ? (
             <form
               onSubmit={handleUpdate}
-              className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl space-y-6 shadow-sm sticky top-24"
+              className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-6 shadow-sm sticky top-24"
             >
               <div>
                 <h3 className="heading-display text-base font-bold flex items-center space-x-2">

@@ -100,20 +100,20 @@ export default function Cart() {
             return (
               <div
                 key={item.id}
-                className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl gap-4 shadow-sm"
+                className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl gap-4 shadow-sm"
               >
                 {/* Left: Media and Info */}
                 <div className="flex items-center space-x-4">
                   <div className="w-16 h-16 rounded-lg overflow-hidden bg-slate-50 dark:bg-dark-950 flex-shrink-0 border">
                     <img
-                      src={primaryMedia.startsWith('http') ? primaryMedia : `http://localhost:5000${primaryMedia}`}
+                      src={primaryMedia.startsWith('http') ? primaryMedia : `${import.meta.env.VITE_API_URL.replace('/api', '')}${primaryMedia}`}
                       alt={product.name}
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <div>
                     <Link to={`/product/${product.id}`} className="hover:text-brand-600 dark:hover:text-brand-400">
-                      <h4 className="font-semibold text-sm text-slate-850 dark:text-slate-100 line-clamp-1">
+                      <h4 className="font-semibold text-sm text-slate-800 dark:text-slate-100 line-clamp-1">
                         {product.name}
                       </h4>
                     </Link>
@@ -161,7 +161,7 @@ export default function Cart() {
 
         {/* Order Summaries Column */}
         <div>
-          <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl space-y-6 shadow-sm">
+          <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-6 shadow-sm">
             <h3 className="heading-display text-lg font-bold">Order Summary</h3>
             
             <div className="space-y-3 text-sm border-b pb-4">

@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore.js';
-import { useCartStore } from '../../store/cartStore.js';
 import axiosInstance from '../../api/axios.js';
 import toast from 'react-hot-toast';
 import { Mail, Lock, Loader2, ArrowRight, ArrowLeft, Eye, EyeOff } from 'lucide-react';
@@ -14,15 +13,14 @@ const loginSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters')
 });
 
-export default function Login() {
+export default function VendorLogin() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const setCredentials = useAuthStore((state) => state.setCredentials);
-  const fetchCart = useCartStore((state) => state.fetchCart);
   
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/';
+  const from = location.state?.from?.pathname || '/vendor/dashboard';
 
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(loginSchema)
@@ -31,29 +29,21 @@ export default function Login() {
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      const endpoint = '/auth/login';
+      const endpoint = '/auth/vendor/login';
       const response = await axiosInstance.post(endpoint, data);
       
       const { user, token } = response.data.data;
       setCredentials(user, token);
       
-      toast.success(response.data.message || 'Login successful!');
+      toast.success(response.data.message || 'Vendor login successful!');
       
-      // Fetch cart for customers
-      if (user.role === 'USER') {
-        await fetchCart();
-      }
-
-      // Route redirection
       if (user.role === 'VENDOR') {
         navigate('/vendor/dashboard');
-      } else if (user.role === 'ADMIN') {
-        navigate('/admin/dashboard');
       } else {
         navigate(from, { replace: true });
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Login failed. Please check credentials.');
+      toast.error(err.response?.data?.message || 'Login failed. Please check vendor credentials.');
     } finally {
       setIsLoading(false);
     }
@@ -63,9 +53,9 @@ export default function Login() {
     <div className="min-h-[75vh] flex items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full glass p-8 rounded-2xl border shadow-xl relative overflow-hidden transition-all">
         
-        {/* Decorative backdrop gradients */}
-        <div className="absolute -top-10 -right-10 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl pointer-events-none"></div>
-        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
+        {/* Decorative backdrop gradients - Amber/Orange for Vendors */}
+        <div className="absolute -top-10 -right-10 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
         {/* Back Button */}
         <Link 
@@ -77,15 +67,13 @@ export default function Login() {
         </Link>
 
         <div className="text-center mb-8">
-          <h2 className="heading-display text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-brand-600 to-indigo-600 dark:from-brand-400 dark:to-indigo-400 bg-clip-text text-transparent">
-            Welcome Back
+          <h2 className="heading-display text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-amber-600 to-brand-600 dark:from-amber-400 dark:to-brand-400 bg-clip-text text-transparent">
+            Vendor Portal
           </h2>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-            Sign in to manage your account
+            Sign in to manage your shop and products
           </p>
         </div>
-
-
 
         <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
           {/* Email field */}
@@ -100,10 +88,10 @@ export default function Login() {
               <input
                 type="email"
                 {...register('email')}
-                className={`block w-full pl-10 pr-3 py-2.5 bg-white/50 dark:bg-dark-900/50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all ${
+                className={`block w-full pl-10 pr-3 py-2.5 bg-white/50 dark:bg-dark-900/50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all ${
                   errors.email ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 dark:border-slate-700'
                 }`}
-                placeholder="you@example.com"
+                placeholder="vendor@example.com"
               />
             </div>
             {errors.email && (
@@ -123,7 +111,7 @@ export default function Login() {
               <input
                 type={showPassword ? 'text' : 'password'}
                 {...register('password')}
-                className={`block w-full pl-10 pr-10 py-2.5 bg-white/50 dark:bg-dark-900/50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all ${
+                className={`block w-full pl-10 pr-10 py-2.5 bg-white/50 dark:bg-dark-900/50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all ${
                   errors.password ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 dark:border-slate-700'
                 }`}
                 placeholder="••••••••"
@@ -145,7 +133,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 disabled:opacity-50 transition-colors cursor-pointer"
+            className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-semibold text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 transition-colors cursor-pointer"
           >
             {isLoading ? (
               <>
@@ -162,9 +150,9 @@ export default function Login() {
         </form>
 
         <div className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
-          <span>Don't have an account? </span>
-          <Link to="/register" className="font-semibold text-brand-600 hover:text-brand-500 dark:text-brand-400 dark:hover:text-brand-300">
-            Sign Up
+          <span>Don't have a business account? </span>
+          <Link to="/vendor/register" className="font-semibold text-amber-600 hover:text-amber-500 dark:text-amber-400 dark:hover:text-amber-300">
+            Register Business
           </Link>
         </div>
       </div>

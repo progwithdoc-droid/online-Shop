@@ -134,7 +134,7 @@ export default function ProductDetails() {
   const isOutOfStock = product.stock <= 0;
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-6 md:space-y-12">
       {/* Product Details Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
         
@@ -143,14 +143,14 @@ export default function ProductDetails() {
           <div className="aspect-square w-full bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden relative shadow-sm">
             {activeMedia?.type === 'VIDEO' ? (
               <video
-                src={activeMedia.url.startsWith('http') ? activeMedia.url : `http://localhost:5000${activeMedia.url}`}
+                src={activeMedia.url.startsWith('http') ? activeMedia.url : `${import.meta.env.VITE_API_URL.replace('/api', '')}${activeMedia.url}`}
                 controls
                 className="w-full h-full object-cover"
                 poster={product.media?.find(m => m.type === 'IMAGE')?.url}
               />
             ) : (
               <img
-                src={activeMedia?.url?.startsWith('http') ? activeMedia.url : `http://localhost:5000${activeMedia?.url}`}
+                src={activeMedia?.url?.startsWith('http') ? activeMedia.url : `${import.meta.env.VITE_API_URL.replace('/api', '')}${activeMedia?.url}`}
                 alt={product.name}
                 className="w-full h-full object-cover"
               />
@@ -169,7 +169,7 @@ export default function ProductDetails() {
                   }`}
                 >
                   <img
-                    src={med.type === 'VIDEO' ? (product.media.find(m => m.type === 'IMAGE')?.url || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100') : (med.url.startsWith('http') ? med.url : `http://localhost:5000${med.url}`)}
+                    src={med.type === 'VIDEO' ? (product.media.find(m => m.type === 'IMAGE')?.url || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100') : (med.url.startsWith('http') ? med.url : `${import.meta.env.VITE_API_URL.replace('/api', '')}${med.url}`)}
                     alt=""
                     className="w-full h-full object-cover"
                   />
@@ -205,24 +205,24 @@ export default function ProductDetails() {
           </div>
 
           {/* Pricing */}
-          <div className="flex items-baseline space-x-3 p-4 bg-slate-100 dark:bg-dark-900 border dark:border-slate-850 rounded-2xl">
-            <span className="text-2xl md:text-3xl font-extrabold text-brand-600 dark:text-brand-400">
+          <div className="flex items-baseline space-x-3 p-4 bg-slate-100 dark:bg-dark-900 border dark:border-slate-800 rounded-2xl">
+            <span className="text-xl md:text-3xl font-extrabold text-brand-600 dark:text-brand-400">
               {formatCurrency(product.price)}
             </span>
             {hasDiscount && (
-              <span className="text-sm md:text-base text-slate-450 line-through">
+              <span className="text-sm md:text-base text-slate-400 line-through">
                 {formatCurrency(product.compareAtPrice)}
               </span>
             )}
           </div>
 
           {/* Details */}
-          <div className="space-y-4 border-y border-slate-200 dark:border-slate-850 py-4">
-            <p className="text-sm text-slate-650 dark:text-slate-350 leading-relaxed">
+          <div className="space-y-4 border-y border-slate-200 dark:border-slate-800 py-4">
+            <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
               {product.description}
             </p>
 
-            <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-slate-500">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-semibold text-slate-500">
               <div className="flex items-center space-x-2">
                 <ShieldCheck className="w-4 h-4 text-brand-500" />
                 <span>Return Window: {product.returnWindowDays} days</span>
@@ -268,7 +268,7 @@ export default function ProductDetails() {
                 </button>
                 <button
                   onClick={handleAddToWishlist}
-                  className="flex justify-center items-center p-3 border border-slate-350 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-dark-850 text-slate-600 dark:text-slate-300 transition-colors"
+                  className="flex justify-center items-center p-3 border border-slate-400 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-dark-850 text-slate-600 dark:text-slate-300 transition-colors"
                   title="Add to Wishlist"
                 >
                   <Heart className="w-5 h-5" />
@@ -293,7 +293,7 @@ export default function ProductDetails() {
       </div>
 
       {/* Review Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8 border-t border-slate-200 dark:border-slate-850">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8 border-t border-slate-200 dark:border-slate-800">
         
         {/* Write a review column */}
         <div className="space-y-4">
@@ -303,7 +303,7 @@ export default function ProductDetails() {
           </h2>
           
           {isAuthenticated ? (
-            <form onSubmit={handleSubmitReview} className="space-y-4 p-5 bg-white dark:bg-dark-900 border dark:border-slate-850 rounded-2xl shadow-sm">
+            <form onSubmit={handleSubmitReview} className="space-y-4 p-5 bg-white dark:bg-dark-900 border dark:border-slate-800 rounded-2xl shadow-sm">
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
                   Rating:
@@ -361,7 +361,7 @@ export default function ProductDetails() {
               </button>
             </form>
           ) : (
-            <div className="p-4 bg-slate-50 dark:bg-dark-900 border dark:border-slate-850 rounded-2xl text-center text-sm text-slate-400">
+            <div className="p-4 bg-slate-50 dark:bg-dark-900 border dark:border-slate-800 rounded-2xl text-center text-sm text-slate-400">
               Please <Link to="/login" className="text-brand-600 font-bold hover:underline">Login</Link> to write a review.
             </div>
           )}
@@ -380,7 +380,7 @@ export default function ProductDetails() {
               {reviews.map((rev) => (
                 <div
                   key={rev.id}
-                  className="p-5 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl space-y-2 shadow-sm"
+                  className="p-5 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-2 shadow-sm"
                 >
                   <div className="flex justify-between items-start">
                     <div>
@@ -395,7 +395,7 @@ export default function ProductDetails() {
                     <span className="text-[10px] text-slate-400">{formatDate(rev.createdAt)}</span>
                   </div>
 
-                  <p className="text-xs text-slate-650 dark:text-slate-350 leading-relaxed">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                     {rev.body}
                   </p>
 

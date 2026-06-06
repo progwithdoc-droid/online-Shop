@@ -127,9 +127,9 @@ export default function Profile() {
         <div className="lg:col-span-2 space-y-6">
           
           {/* Avatar and Profile settings */}
-          <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl space-y-6 shadow-sm">
+          <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-6 shadow-sm">
             <h2 className="heading-display text-lg font-bold flex items-center space-x-2">
-              <User className="w-5 h-5 text-brand-650" />
+              <User className="w-5 h-5 text-brand-600" />
               <span>Personal Details</span>
             </h2>
 
@@ -139,7 +139,7 @@ export default function Profile() {
                 <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-slate-200 dark:border-slate-800 bg-slate-50 flex items-center justify-center">
                   {user?.avatar ? (
                     <img
-                      src={user.avatar.startsWith('http') ? user.avatar : `http://localhost:5000${user.avatar}`}
+                      src={user.avatar.startsWith('http') ? user.avatar : `${import.meta.env.VITE_API_URL.replace('/api', '')}${user.avatar}`}
                       alt={user.name}
                       className="w-full h-full object-cover"
                     />
@@ -178,7 +178,7 @@ export default function Profile() {
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-dark-950 border border-slate-350 dark:border-slate-800 rounded-lg text-sm focus:outline-none"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-dark-950 border border-slate-400 dark:border-slate-800 rounded-lg text-sm focus:outline-none"
                     required
                   />
                 </div>
@@ -188,7 +188,7 @@ export default function Profile() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-dark-950 border border-slate-350 dark:border-slate-800 rounded-lg text-sm focus:outline-none"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-dark-950 border border-slate-400 dark:border-slate-800 rounded-lg text-sm focus:outline-none"
                     required
                   />
                 </div>
@@ -206,9 +206,9 @@ export default function Profile() {
 
           {/* Address Management (Only for customers) */}
           {user?.role === 'USER' && (
-            <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl space-y-4 shadow-sm">
+            <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-4 shadow-sm">
               <h2 className="heading-display text-lg font-bold flex items-center space-x-2">
-                <MapPin className="w-5 h-5 text-brand-650" />
+                <MapPin className="w-5 h-5 text-brand-600" />
                 <span>My Addresses</span>
               </h2>
 
@@ -223,7 +223,7 @@ export default function Profile() {
                   {addresses.map((addr) => (
                     <div
                       key={addr.id}
-                      className="flex justify-between items-start p-4 border border-slate-200 dark:border-slate-850 rounded-xl"
+                      className="flex justify-between items-start p-4 border border-slate-200 dark:border-slate-800 rounded-xl"
                     >
                       <div>
                         <div className="flex items-center space-x-2">
@@ -234,7 +234,7 @@ export default function Profile() {
                             <span className="text-[9px] font-bold text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded">Default</span>
                           )}
                         </div>
-                        <p className="text-xs text-slate-650 dark:text-slate-350 mt-1">
+                        <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
                           {addr.line1}, {addr.line2 && `${addr.line2}, `}{addr.city}, {addr.state} — {addr.pincode}, {addr.country}
                         </p>
                       </div>
@@ -267,9 +267,9 @@ export default function Profile() {
 
         {/* Right Side: Security */}
         <div>
-          <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl space-y-4 shadow-sm">
+          <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-4 shadow-sm">
             <h2 className="heading-display text-lg font-bold flex items-center space-x-2">
-              <Key className="w-5 h-5 text-brand-650" />
+              <Key className="w-5 h-5 text-brand-600" />
               <span>Change Password</span>
             </h2>
 
@@ -281,7 +281,7 @@ export default function Profile() {
                   value={oldPassword}
                   onChange={(e) => setOldPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-dark-950 border border-slate-350 dark:border-slate-800 rounded-lg text-sm focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-dark-950 border border-slate-400 dark:border-slate-800 rounded-lg text-sm focus:outline-none"
                   required
                 />
               </div>
@@ -293,7 +293,7 @@ export default function Profile() {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-dark-950 border border-slate-350 dark:border-slate-800 rounded-lg text-sm focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-dark-950 border border-slate-400 dark:border-slate-800 rounded-lg text-sm focus:outline-none"
                   required
                 />
               </div>

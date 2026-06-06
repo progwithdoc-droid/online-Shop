@@ -69,23 +69,23 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8">
-      <h1 className="heading-display text-3xl font-extrabold text-slate-800 dark:text-slate-100 border-b pb-4">
+      <h1 className="heading-display text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-slate-100 border-b pb-4">
         Admin Dashboard
       </h1>
 
       {/* Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl flex items-center justify-between shadow-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center justify-between shadow-sm">
           <div className="space-y-1">
             <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Total Platform GMV</span>
             <span className="text-xl font-black text-slate-855 dark:text-slate-100">{formatCurrency(stats?.totalSales || 0)}</span>
           </div>
-          <div className="p-3 bg-brand-50 dark:bg-brand-950/20 rounded-xl text-brand-600">
+          <div className="p-3 bg-brand-50 dark:bg-brand-900/20 rounded-xl text-brand-600">
             <CreditCard className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl flex items-center justify-between shadow-sm">
+        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center justify-between shadow-sm">
           <div className="space-y-1">
             <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Registered Users</span>
             <span className="text-xl font-black text-slate-855 dark:text-slate-100">{stats?.totalUsers || 0}</span>
@@ -95,7 +95,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl flex items-center justify-between shadow-sm">
+        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center justify-between shadow-sm">
           <div className="space-y-1">
             <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Verified Vendors</span>
             <span className="text-xl font-black text-slate-855 dark:text-slate-100">{stats?.totalVendors || 0}</span>
@@ -105,7 +105,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl flex items-center justify-between shadow-sm">
+        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center justify-between shadow-sm">
           <div className="space-y-1">
             <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Open Complaints</span>
             <span className="text-xl font-black text-slate-855 dark:text-slate-100">{stats?.openComplaints || 0}</span>
@@ -118,7 +118,7 @@ export default function AdminDashboard() {
 
       {/* Chart */}
       {salesHistory.length > 0 && (
-        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl shadow-sm">
+        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm">
           <h3 className="heading-display text-base font-bold mb-6">Platform Sales Revenue Timeline</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -138,19 +138,19 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
         {/* Verification Queue */}
-        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl space-y-4 shadow-sm">
+        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-4 shadow-sm">
           <h3 className="heading-display text-base font-bold">Pending Vendor Verification Queue</h3>
 
           {pendingVerification?.length === 0 ? (
             <p className="text-slate-400 text-xs italic">No vendors currently awaiting verification.</p>
           ) : (
-            <div className="divide-y divide-slate-100 dark:divide-slate-850 space-y-3">
+            <div className="divide-y divide-slate-100 dark:divide-slate-800 space-y-3">
               {pendingVerification?.map((vp) => (
                 <div key={vp.id} className="pt-3 first:pt-0 flex justify-between items-start text-xs gap-4">
                   <div>
                     <span className="font-bold text-slate-800 dark:text-slate-100 block">{vp.businessName}</span>
-                    <span className="text-[10px] text-slate-450 block mt-0.5">Owner: {vp.user?.name} ({vp.user?.email})</span>
-                    <span className="text-[10px] text-slate-450 block">GSTIN: {vp.gstNumber || 'N/A'}</span>
+                    <span className="text-[10px] text-slate-400 block mt-0.5">Owner: {vp.user?.name} ({vp.user?.email})</span>
+                    <span className="text-[10px] text-slate-400 block">GSTIN: {vp.gstNumber || 'N/A'}</span>
                   </div>
 
                   <div className="flex space-x-2 shrink-0">
@@ -178,18 +178,18 @@ export default function AdminDashboard() {
         </div>
 
         {/* Complaints Overview */}
-        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl space-y-4 shadow-sm">
+        <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-4 shadow-sm">
           <h3 className="heading-display text-base font-bold">Recent Platform Complaints</h3>
 
           {recentComplaints?.length === 0 ? (
             <p className="text-slate-400 text-xs italic">No complaints registered recently.</p>
           ) : (
-            <div className="divide-y divide-slate-100 dark:divide-slate-850 space-y-3">
+            <div className="divide-y divide-slate-100 dark:divide-slate-800 space-y-3">
               {recentComplaints?.map((comp) => (
                 <div key={comp.id} className="pt-3 first:pt-0 text-xs">
-                  <div className="flex justify-between items-start">
-                    <span className="font-bold text-slate-800 dark:text-slate-100 truncate max-w-[200px]">{comp.subject}</span>
-                    <span className="text-[10px] text-slate-400">{formatDate(comp.createdAt)}</span>
+                  <div className="flex justify-between items-start gap-2">
+                    <span className="font-bold text-slate-800 dark:text-slate-100 truncate flex-1 min-w-0 mr-4">{comp.subject}</span>
+                    <span className="text-[10px] text-slate-400 shrink-0">{formatDate(comp.createdAt)}</span>
                   </div>
                   <p className="text-slate-500 text-[11px] line-clamp-1 mt-1">{comp.body}</p>
                   

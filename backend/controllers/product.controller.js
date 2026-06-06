@@ -17,6 +17,7 @@ export const getProducts = async (req, res) => {
     });
     return sendSuccess(res, result, 'Products retrieved successfully');
   } catch (error) {
+    console.error("getProducts Error:", error);
     return sendError(res, error.message, 400);
   }
 };

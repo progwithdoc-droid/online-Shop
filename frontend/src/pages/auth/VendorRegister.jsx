@@ -6,7 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore.js';
 import axiosInstance from '../../api/axios.js';
 import toast from 'react-hot-toast';
-import { User, Mail, Lock, Building, FileText, Landmark, Loader2, ArrowRight, ArrowLeft } from 'lucide-react';
+import { User, Mail, Lock, Building, FileText, Landmark, Loader2, ArrowRight, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 
 const vendorFormSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -23,6 +23,7 @@ const vendorFormSchema = z.object({
 export default function VendorRegister() {
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const setCredentials = useAuthStore((state) => state.setCredentials);
   const navigate = useNavigate();
 
@@ -79,7 +80,7 @@ export default function VendorRegister() {
         <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
         <div className="text-center mb-8">
-          <h2 className="heading-display text-3xl font-extrabold bg-gradient-to-r from-amber-600 to-brand-600 dark:from-amber-400 dark:to-brand-400 bg-clip-text text-transparent">
+          <h2 className="heading-display text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-amber-600 to-brand-600 dark:from-amber-400 dark:to-brand-400 bg-clip-text text-transparent">
             SparkIT Vendor Hub
           </h2>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
@@ -146,13 +147,20 @@ export default function VendorRegister() {
                     <Lock className="w-5 h-5" />
                   </div>
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     {...register('password')}
-                    className={`block w-full pl-10 pr-3 py-2.5 bg-white/50 dark:bg-dark-900/50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all ${
+                    className={`block w-full pl-10 pr-10 py-2.5 bg-white/50 dark:bg-dark-900/50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all ${
                       errors.password ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 dark:border-slate-700'
                     }`}
                     placeholder="••••••••"
                   />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
                 </div>
                 {errors.password && (
                   <p className="mt-1 text-xs text-red-500 font-medium">{errors.password.message}</p>
@@ -233,7 +241,7 @@ export default function VendorRegister() {
                   Bank Remittance Info (Optional)
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                   <input
                     type="text"
                     {...register('bankName')}
@@ -288,7 +296,7 @@ export default function VendorRegister() {
 
         <div className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
           <span>Already registered? </span>
-          <Link to="/login" className="font-semibold text-brand-600 hover:text-brand-500 dark:text-brand-400 dark:hover:text-brand-300">
+          <Link to="/vendor/login" className="font-semibold text-amber-600 hover:text-amber-500 dark:text-amber-400 dark:hover:text-amber-300">
             Sign In
           </Link>
         </div>

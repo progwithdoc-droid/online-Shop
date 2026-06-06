@@ -192,13 +192,13 @@ export default function VendorProducts() {
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-baseline border-b pb-4">
-        <h1 className="heading-display text-3xl font-extrabold text-slate-800 dark:text-slate-100">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline border-b pb-4 gap-4">
+        <h1 className="heading-display text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-slate-100">
           My Products
         </h1>
         <button
           onClick={handleOpenCreateModal}
-          className="flex items-center space-x-2 px-4 py-2.5 bg-brand-650 hover:bg-brand-700 text-white font-bold rounded-xl shadow-md transition-colors cursor-pointer"
+          className="flex items-center space-x-2 px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-md transition-colors cursor-pointer"
         >
           <Plus className="w-5 h-5" />
           <span>Add Product</span>
@@ -224,11 +224,11 @@ export default function VendorProducts() {
             return (
               <div
                 key={product.id}
-                className="bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-850 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between"
+                className="bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between"
               >
                 <div className="aspect-video w-full bg-slate-50 dark:bg-dark-950 relative border-b">
                   <img
-                    src={primaryImage.startsWith('http') ? primaryImage : `http://localhost:5000${primaryImage}`}
+                    src={primaryImage.startsWith('http') ? primaryImage : `${import.meta.env.VITE_API_URL.replace('/api', '')}${primaryImage}`}
                     alt=""
                     className="w-full h-full object-cover"
                   />
@@ -250,7 +250,7 @@ export default function VendorProducts() {
 
                   <div className="flex justify-between items-baseline text-xs font-semibold">
                     <span className="text-slate-500">Stock: <span className="font-bold text-slate-805 dark:text-slate-200">{product.stock} units</span></span>
-                    <span className="text-sm font-bold text-brand-650">{formatCurrency(product.price)}</span>
+                    <span className="text-sm font-bold text-brand-600">{formatCurrency(product.price)}</span>
                   </div>
 
                   <div className="pt-2 border-t flex justify-between space-x-2">
@@ -423,7 +423,7 @@ export default function VendorProducts() {
             <div className="flex justify-between items-start border-b pb-4">
               <div>
                 <h3 className="heading-display text-lg font-bold">Product Media Gallery</h3>
-                <p className="text-xs text-slate-450">{selectedProduct?.name}</p>
+                <p className="text-xs text-slate-400">{selectedProduct?.name}</p>
               </div>
               <button onClick={() => setShowMediaModal(false)} className="p-1 hover:bg-slate-100 rounded-full">
                 <X className="w-5 h-5 text-slate-500" />
@@ -436,10 +436,10 @@ export default function VendorProducts() {
               {selectedProduct?.media?.length === 0 ? (
                 <p className="text-xs text-slate-405 italic">No images or videos uploaded for this product yet.</p>
               ) : (
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                   {selectedProduct?.media?.map((med) => (
                     <div key={med.id} className="relative aspect-square border rounded-lg overflow-hidden group">
-                      <img src={med.type === 'VIDEO' ? 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100' : (med.url.startsWith('http') ? med.url : `http://localhost:5000${med.url}`)} alt="" className="w-full h-full object-cover" />
+                      <img src={med.type === 'VIDEO' ? 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100' : (med.url.startsWith('http') ? med.url : `${import.meta.env.VITE_API_URL.replace('/api', '')}${med.url}`)} alt="" className="w-full h-full object-cover" />
                       {med.type === 'VIDEO' && (
                         <div className="absolute inset-0 bg-black/30 flex items-center justify-center text-white">
                           <Film className="w-5 h-5" />
