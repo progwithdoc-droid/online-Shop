@@ -1,4 +1,4 @@
-﻿# Scalable Ecommerce Platform
+﻿# Spark- Ecommerece Application
 
 A full-stack ecommerce application built with a Node.js backend and a React frontend. The project demonstrates a production-oriented architecture featuring authentication, role-based access control, product catalog management, shopping cart workflows, order processing, complaint handling, and vendor administration.
 
