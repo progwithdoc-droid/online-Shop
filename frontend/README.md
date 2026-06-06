@@ -1,16 +1,101 @@
-# React + Vite
+﻿# Frontend Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern React frontend built with Vite and Tailwind CSS for a full-stack ecommerce experience. This application provides role-aware views, authenticated navigation, and an API-driven architecture for customers, vendors, and administrators.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The frontend is designed for a scalable production application, with clear separation between page views, reusable UI components, layout structure, and API integration. It consumes the backend API and provides dynamic product browsing, cart and order workflows, user profiles, vendor dashboards, and admin management panels.
 
-## React Compiler
+## Key Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Role-based route protection for customer, vendor, and admin access
+- Responsive interface with Tailwind CSS
+- API communication through a centralized Axios instance
+- Form handling with React Hook Form and Zod validation
+- Client state management via Zustand and React Query
+- Dashboard and product management flows for vendors and admins
 
-## Expanding the ESLint configuration
+## Technology Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- React 19
+- Vite
+- Tailwind CSS
+- React Router DOM
+- React Hook Form
+- React Query
+- Zod validation
+- Axios for HTTP requests
+- Zustand for lightweight state management
+
+## Project Structure
+
+- `src/main.jsx` - application entry point
+- `src/App.jsx` - top-level application router and layout wrapper
+- `src/pages/` - page components grouped by role and feature
+- `src/components/layout/` - shared layout components and route guards
+- `src/api/axios.js` - base API client configuration
+- `src/store/` - client-side state stores
+- `src/utils/formatters.js` - reusable presentation utilities
+
+## Prerequisites
+
+- Node.js 18 or later
+- npm 10 or later
+- Backend API running locally or in the configured environment
+
+## Installation
+
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Create the environment file:
+   ```bash
+   cp .env.sample .env
+   ```
+4. Update `.env` if necessary. By default, the API URL is configured for local backend development.
+
+## Running Locally
+
+- Start the development server:
+  ```bash
+  npm run dev
+  ```
+- Build production-ready assets:
+  ```bash
+  npm run build
+  ```
+- Preview the production build locally:
+  ```bash
+  npm run preview
+  ```
+- Run lint checks:
+  ```bash
+  npm run lint
+  ```
+
+## Environment Variables
+
+- `VITE_API_URL` - base API endpoint used by the frontend for backend requests
+
+## Best Practices
+
+- Keep frontend API URL configuration in `.env` for local and deployment environments
+- Use linting to maintain code consistency and catch issues early
+- Keep reusable logic in `src/utils` and `src/components` to reduce duplication
+- Maintain separate route guards for authenticated and role-based pages
+- Use production builds for deployment to ensure optimized assets
+
+## Extending the Frontend
+
+This frontend is structured to support additional ecommerce capabilities:
+
+- product search, filtering, and sorting
+- advanced analytics and reporting dashboards
+- real-time order status and notifications
+- multi-language support and localization
+- payment and checkout enhancements
