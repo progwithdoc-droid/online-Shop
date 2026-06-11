@@ -151,7 +151,7 @@ export default function VendorDashboard() {
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {recentOrders?.map((ord) => (
                     <tr key={ord.id} className="text-slate-600 dark:text-slate-400">
-                      <td className="py-4 font-mono font-medium truncate max-w-[80px]">{ord.id}</td>
+                      <td className="py-4 font-mono font-medium truncate max-w-20">{ord.id}</td>
                       <td className="py-4">
                         <span className="font-bold text-slate-800 dark:text-slate-200 block">{ord.product?.name}</span>
                         <span className="text-[10px] text-slate-400">{ord.quantity} units ordered</span>
@@ -204,7 +204,7 @@ export default function VendorDashboard() {
               {lowStockProducts?.map((p) => (
                 <div key={p.id} className="p-3 bg-warning-bg/30 text-warning-text border border-warning-text/20 rounded-xl flex justify-between items-center text-xs">
                   <div>
-                    <span className="font-bold text-slate-800 dark:text-slate-200 block truncate max-w-[150px]">{p.name}</span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200 block truncate max-w-37.5">{p.name}</span>
                     <span className="text-[10px] opacity-70">SKU: {p.sku || 'N/A'}</span>
                   </div>
                   <span className="px-2 py-0.5 bg-danger-bg text-danger-text font-bold rounded border border-danger-text/20">

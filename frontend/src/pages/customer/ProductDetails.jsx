@@ -164,7 +164,7 @@ export default function ProductDetails() {
                 <button
                   key={med.id}
                   onClick={() => setActiveMedia(med)}
-                  className={`relative w-20 h-20 rounded-xl overflow-hidden border-2 flex-shrink-0 transition-all ${
+                  className={`relative w-20 h-20 rounded-xl overflow-hidden border-2 shrink-0 transition-all ${
                     activeMedia?.id === med.id ? 'border-brand-600' : 'border-transparent'
                   }`}
                 >
