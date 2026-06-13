@@ -100,11 +100,12 @@ export default function Checkout() {
       };
 
       const response = await axiosInstance.post('/orders', payload);
-      toast.success(response.data.message || 'Order placed successfully!');
+      const createdOrder = response.data.data;
+      toast.success('Order placed successfully!');
       
-      // Clear Cart state & redirect to order summaries
+      // Clear Cart state & redirect to success screen
       clearCart();
-      navigate('/orders');
+      navigate(`/payment-success?orderId=${createdOrder.id}`);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Order placement failed');
     } finally {

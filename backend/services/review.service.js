@@ -1,6 +1,7 @@
 import { eq, and } from 'drizzle-orm';
 import { db } from '../config/db.js';
-import { reviews, products, orderItems, orders } from '../models/schema.js';
+import { reviews, products, orderItems, orders, users } from '../models/schema.js';
+import * as notificationService from './notification.service.js';
 
 export const createReview = async (userId, productId, reviewData) => {
   // Check if product exists
@@ -37,6 +38,16 @@ export const createReview = async (userId, productId, reviewData) => {
     productId,
     isVerifiedPurchase
   }).returning();
+
+  // Send real-time notification to product owner (vendor)
+  const [reviewer] = await db.select({ name: users.name }).from(users).where(eq(users.id, userId)).limit(1);
+  await notificationService.create(
+    product.vendorId,
+    'NEW_REVIEW',
+    'New review on your product',
+    `${reviewer?.name || 'A customer'} left a ${reviewData.rating}★ review on your product "${product.name}"`,
+    { productId, reviewId: newReview.id }
+  );
 
   return newReview;
 };

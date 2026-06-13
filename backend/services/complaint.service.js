@@ -1,6 +1,7 @@
 import { eq, and, desc } from 'drizzle-orm';
 import { db } from '../config/db.js';
 import { complaints, users, products, orders } from '../models/schema.js';
+import * as notificationService from './notification.service.js';
 
 export const createComplaint = async (userId, complaintData) => {
   const [complaint] = await db.insert(complaints).values({
@@ -71,6 +72,15 @@ export const respondToComplaint = async (complaintId, userId, role, resolution) 
     })
     .where(eq(complaints.id, complaintId))
     .returning();
+
+  // Send real-time notification to the user who filed the complaint
+  await notificationService.create(
+    complaint.userId,
+    'COMPLAINT_RESOLVED',
+    'Complaint resolved',
+    `Your complaint regarding "${complaint.subject}" has been resolved`,
+    { complaintId }
+  );
 
   return updated;
 };

@@ -25,6 +25,7 @@ try {
     // NeonDB HTTP serverless driver (high concurrency, stateless, auto-scaling)
     const sql = neon(connectionString);
     db = drizzleNeon(sql, { schema });
+    db.transaction = undefined;
     console.log("Initialized NeonDB serverless HTTP client.");
   } else {
     // Fallback stub client for initialization without erroring on start

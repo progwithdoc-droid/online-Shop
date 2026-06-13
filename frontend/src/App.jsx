@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Layout from './components/layout/Layout.jsx';
 import ProtectedRoute from './components/layout/ProtectedRoute.jsx';
 import RoleRoute from './components/layout/RoleRoute.jsx';
@@ -18,6 +19,8 @@ import Wishlist from './pages/customer/Wishlist.jsx';
 import Checkout from './pages/customer/Checkout.jsx';
 import Orders from './pages/customer/Orders.jsx';
 import Profile from './pages/customer/Profile.jsx';
+import PaymentSuccess from './pages/checkout/PaymentSuccess.jsx';
+import OrderTracking from './pages/user/OrderTracking.jsx';
 
 // Vendor Pages
 import VendorDashboard from './pages/vendor/VendorDashboard.jsx';
@@ -38,6 +41,15 @@ import NotFound from './pages/common/NotFound.jsx';
 import { useCartStore } from './store/cartStore.js';
 import { useAuthStore } from './store/authStore.js';
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1
+    }
+  }
+});
+
 function App() {
   const { isAuthenticated, role } = useAuthStore();
   const fetchCart = useCartStore((state) => state.fetchCart);
@@ -50,107 +62,121 @@ function App() {
   }, [isAuthenticated, role]);
 
   return (
-    <BrowserRouter>
-      <Layout>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={
-            role === 'VENDOR' ? <Navigate to="/vendor/dashboard" replace /> :
-            role === 'ADMIN' ? <Navigate to="/admin/dashboard" replace /> :
-            <Home />
-          } />
-          <Route path="/product/:id" element={<ProductDetails />} />
-          <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <Login />} />
-          <Route path="/register" element={isAuthenticated ? <Navigate to="/" replace /> : <Register />} />
-          <Route path="/vendor/login" element={role === 'VENDOR' ? <Navigate to="/vendor/dashboard" replace /> : <VendorLogin />} />
-          <Route path="/vendor/register" element={role === 'VENDOR' ? <Navigate to="/vendor/dashboard" replace /> : <VendorRegister />} />
-          
-          {/* Protected Customer Routes */}
-          <Route path="/cart" element={
-            <ProtectedRoute>
-              <Cart />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/wishlist" element={
-            <ProtectedRoute>
-              <Wishlist />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/checkout" element={
-            <ProtectedRoute>
-              <Checkout />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/orders" element={
-            <ProtectedRoute>
-              <Orders />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/profile" element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          } />
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Layout>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={
+              role === 'VENDOR' ? <Navigate to="/vendor/dashboard" replace /> :
+              role === 'ADMIN' ? <Navigate to="/admin/dashboard" replace /> :
+              <Home />
+            } />
+            <Route path="/product/:id" element={<ProductDetails />} />
+            <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <Login />} />
+            <Route path="/register" element={isAuthenticated ? <Navigate to="/" replace /> : <Register />} />
+            <Route path="/vendor/login" element={role === 'VENDOR' ? <Navigate to="/vendor/dashboard" replace /> : <VendorLogin />} />
+            <Route path="/vendor/register" element={role === 'VENDOR' ? <Navigate to="/vendor/dashboard" replace /> : <VendorRegister />} />
+            
+            {/* Protected Customer Routes */}
+            <Route path="/cart" element={
+              <ProtectedRoute>
+                <Cart />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/wishlist" element={
+              <ProtectedRoute>
+                <Wishlist />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/checkout" element={
+              <ProtectedRoute>
+                <Checkout />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/orders" element={
+              <ProtectedRoute>
+                <Orders />
+              </ProtectedRoute>
+            } />
 
-          {/* Protected Vendor Routes */}
-          <Route path="/vendor" element={
-            <RoleRoute allowedRoles={['VENDOR']}>
-              <Navigate to="/vendor/dashboard" replace />
-            </RoleRoute>
-          } />
-          <Route path="/vendor/dashboard" element={
-            <RoleRoute allowedRoles={['VENDOR']}>
-              <VendorDashboard />
-            </RoleRoute>
-          } />
-          <Route path="/vendor/products" element={
-            <RoleRoute allowedRoles={['VENDOR']}>
-              <VendorProducts />
-            </RoleRoute>
-          } />
-          <Route path="/vendor/complaints" element={
-            <RoleRoute allowedRoles={['VENDOR']}>
-              <VendorComplaints />
-            </RoleRoute>
-          } />
+            <Route path="/payment-success" element={
+              <ProtectedRoute>
+                <PaymentSuccess />
+              </ProtectedRoute>
+            } />
 
-          {/* Protected Admin Routes */}
-          <Route path="/admin" element={
-            <RoleRoute allowedRoles={['ADMIN']}>
-              <Navigate to="/admin/dashboard" replace />
-            </RoleRoute>
-          } />
-          <Route path="/admin/dashboard" element={
-            <RoleRoute allowedRoles={['ADMIN']}>
-              <AdminDashboard />
-            </RoleRoute>
-          } />
-          <Route path="/admin/vendors" element={
-            <RoleRoute allowedRoles={['ADMIN']}>
-              <AdminVendors />
-            </RoleRoute>
-          } />
-          <Route path="/admin/users" element={
-            <RoleRoute allowedRoles={['ADMIN']}>
-              <AdminUsers />
-            </RoleRoute>
-          } />
-          <Route path="/admin/complaints" element={
-            <RoleRoute allowedRoles={['ADMIN']}>
-              <AdminComplaints />
-            </RoleRoute>
-          } />
+            <Route path="/user/orders/:orderId/tracking" element={
+              <ProtectedRoute>
+                <OrderTracking />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } />
 
-          {/* Common Fallbacks */}
-          <Route path="/unauthorized" element={<Unauthorized />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Layout>
-    </BrowserRouter>
+            {/* Protected Vendor Routes */}
+            <Route path="/vendor" element={
+              <RoleRoute allowedRoles={['VENDOR']}>
+                <Navigate to="/vendor/dashboard" replace />
+              </RoleRoute>
+            } />
+            <Route path="/vendor/dashboard" element={
+              <RoleRoute allowedRoles={['VENDOR']}>
+                <VendorDashboard />
+              </RoleRoute>
+            } />
+            <Route path="/vendor/products" element={
+              <RoleRoute allowedRoles={['VENDOR']}>
+                <VendorProducts />
+              </RoleRoute>
+            } />
+            <Route path="/vendor/complaints" element={
+              <RoleRoute allowedRoles={['VENDOR']}>
+                <VendorComplaints />
+              </RoleRoute>
+            } />
+
+            {/* Protected Admin Routes */}
+            <Route path="/admin" element={
+              <RoleRoute allowedRoles={['ADMIN']}>
+                <Navigate to="/admin/dashboard" replace />
+              </RoleRoute>
+            } />
+            <Route path="/admin/dashboard" element={
+              <RoleRoute allowedRoles={['ADMIN']}>
+                <AdminDashboard />
+              </RoleRoute>
+            } />
+            <Route path="/admin/vendors" element={
+              <RoleRoute allowedRoles={['ADMIN']}>
+                <AdminVendors />
+              </RoleRoute>
+            } />
+            <Route path="/admin/users" element={
+              <RoleRoute allowedRoles={['ADMIN']}>
+                <AdminUsers />
+              </RoleRoute>
+            } />
+            <Route path="/admin/complaints" element={
+              <RoleRoute allowedRoles={['ADMIN']}>
+                <AdminComplaints />
+              </RoleRoute>
+            } />
+
+            {/* Common Fallbacks */}
+            <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Layout>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 

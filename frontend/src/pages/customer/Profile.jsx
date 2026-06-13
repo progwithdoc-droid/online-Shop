@@ -2,7 +2,20 @@ import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../api/axios.js';
 import { useAuthStore } from '../../store/authStore.js';
 import toast from 'react-hot-toast';
-import { User, Key, MapPin, Check, Trash2, Camera, Loader2 } from 'lucide-react';
+import { User, Key, MapPin, Check, Trash2, Camera, Loader2, Plus } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+const addressSchema = z.object({
+  label: z.string().min(1, 'Label is required (e.g. Home, Office)'),
+  line1: z.string().min(5, 'Address Line 1 must be at least 5 characters'),
+  line2: z.string().optional(),
+  city: z.string().min(1, 'City is required'),
+  state: z.string().min(1, 'State is required'),
+  pincode: z.string().min(4, 'Pincode is required'),
+  country: z.string().min(1, 'Country is required')
+});
 
 export default function Profile() {
   const { user, updateUser } = useAuthStore();
@@ -23,6 +36,12 @@ export default function Profile() {
   // Addresses state
   const [addresses, setAddresses] = useState([]);
   const [loadingAddresses, setLoadingAddresses] = useState(false);
+  const [showNewAddressForm, setShowNewAddressForm] = useState(false);
+  const [isAddressLoading, setIsAddressLoading] = useState(false);
+
+  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+    resolver: zodResolver(addressSchema)
+  });
 
   const fetchAddresses = async () => {
     setLoadingAddresses(true);
@@ -112,6 +131,21 @@ export default function Profile() {
       fetchAddresses();
     } catch (err) {
       toast.error('Failed to delete address');
+    }
+  };
+
+  const handleAddNewAddress = async (data) => {
+    setIsAddressLoading(true);
+    try {
+      await axiosInstance.post('/addresses', data);
+      toast.success('Address added successfully');
+      reset();
+      setShowNewAddressForm(false);
+      fetchAddresses();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to add address');
+    } finally {
+      setIsAddressLoading(false);
     }
   };
 
@@ -207,10 +241,105 @@ export default function Profile() {
           {/* Address Management (Only for customers) */}
           {user?.role === 'USER' && (
             <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-4 shadow-sm">
-              <h2 className="heading-display text-lg font-bold flex items-center space-x-2">
-                <MapPin className="w-5 h-5 text-brand-600" />
-                <span>My Addresses</span>
-              </h2>
+              <div className="flex justify-between items-center">
+                <h2 className="heading-display text-lg font-bold flex items-center space-x-2">
+                  <MapPin className="w-5 h-5 text-brand-600" />
+                  <span>My Addresses</span>
+                </h2>
+                <button
+                  onClick={() => setShowNewAddressForm(!showNewAddressForm)}
+                  className="flex items-center space-x-1 text-xs font-bold text-brand-600 hover:text-brand-700 transition-colors cursor-pointer"
+                >
+                  <Plus className="w-4.5 h-4.5" />
+                  <span>{showNewAddressForm ? 'Cancel' : 'Add Address'}</span>
+                </button>
+              </div>
+
+              {/* Address Form */}
+              {showNewAddressForm && (
+                <form
+                  onSubmit={handleSubmit(handleAddNewAddress)}
+                  className="p-4 bg-slate-50 dark:bg-dark-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-3 animate-fade-in"
+                >
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <input
+                        type="text"
+                        {...register('label')}
+                        placeholder="Address Label (e.g. Home, Work)"
+                        className="w-full px-3 py-2 bg-white dark:bg-dark-900 border border-slate-300 dark:border-slate-800 rounded text-xs focus:outline-none focus:border-brand-500"
+                      />
+                      {errors.label && <span className="text-[10px] text-red-500">{errors.label.message}</span>}
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        {...register('country')}
+                        placeholder="Country"
+                        className="w-full px-3 py-2 bg-white dark:bg-dark-900 border border-slate-300 dark:border-slate-800 rounded text-xs focus:outline-none focus:border-brand-500"
+                      />
+                      {errors.country && <span className="text-[10px] text-red-500">{errors.country.message}</span>}
+                    </div>
+                  </div>
+
+                  <div>
+                    <input
+                      type="text"
+                      {...register('line1')}
+                      placeholder="Address Line 1"
+                      className="w-full px-3 py-2 bg-white dark:bg-dark-900 border border-slate-300 dark:border-slate-800 rounded text-xs focus:outline-none focus:border-brand-500"
+                    />
+                    {errors.line1 && <span className="text-[10px] text-red-500">{errors.line1.message}</span>}
+                  </div>
+
+                  <div>
+                    <input
+                      type="text"
+                      {...register('line2')}
+                      placeholder="Address Line 2 (Optional)"
+                      className="w-full px-3 py-2 bg-white dark:bg-dark-900 border border-slate-300 dark:border-slate-800 rounded text-xs focus:outline-none focus:border-brand-500"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <input
+                        type="text"
+                        {...register('city')}
+                        placeholder="City"
+                        className="w-full px-3 py-2 bg-white dark:bg-dark-900 border border-slate-300 dark:border-slate-800 rounded text-xs focus:outline-none focus:border-brand-500"
+                      />
+                      {errors.city && <span className="text-[10px] text-red-500">{errors.city.message}</span>}
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        {...register('state')}
+                        placeholder="State"
+                        className="w-full px-3 py-2 bg-white dark:bg-dark-900 border border-slate-300 dark:border-slate-800 rounded text-xs focus:outline-none focus:border-brand-500"
+                      />
+                      {errors.state && <span className="text-[10px] text-red-500">{errors.state.message}</span>}
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        {...register('pincode')}
+                        placeholder="Pincode"
+                        className="w-full px-3 py-2 bg-white dark:bg-dark-900 border border-slate-300 dark:border-slate-800 rounded text-xs focus:outline-none focus:border-brand-500"
+                      />
+                      {errors.pincode && <span className="text-[10px] text-red-500">{errors.pincode.message}</span>}
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isAddressLoading}
+                    className="w-full py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white font-bold text-xs rounded transition-colors cursor-pointer"
+                  >
+                    {isAddressLoading ? 'Saving...' : 'Save Address'}
+                  </button>
+                </form>
+              )}
 
               {loadingAddresses ? (
                 <div className="flex justify-center py-4">

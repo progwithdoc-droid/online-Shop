@@ -15,6 +15,7 @@ export default function ProductDetails() {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [activeMedia, setActiveMedia] = useState(null);
+  const [isWishlisted, setIsWishlisted] = useState(false);
   
   // Review writing state
   const [newRating, setNewRating] = useState(5);
@@ -43,6 +44,16 @@ export default function ProductDetails() {
       // 2. Fetch reviews
       const resReviews = await axiosInstance.get(`/products/${id}/reviews`);
       setReviews(resReviews.data.data.reviews || []);
+
+      // 3. Fetch wishlist status
+      if (isAuthenticated && role === 'USER') {
+        try {
+          const resWishlist = await axiosInstance.get('/wishlist');
+          const wishlist = resWishlist.data.data || [];
+          const found = wishlist.find(w => w.product?.id === id);
+          setIsWishlisted(!!found);
+        } catch (e) {}
+      }
     } catch (err) {
       toast.error('Product not found or has been deleted');
       navigate('/');
@@ -53,7 +64,7 @@ export default function ProductDetails() {
 
   useEffect(() => {
     fetchDetails();
-  }, [id]);
+  }, [id, isAuthenticated, role]);
 
   const handleAddToCart = async () => {
     if (!isAuthenticated) {
@@ -79,11 +90,22 @@ export default function ProductDetails() {
       toast.error('Please login to add items to wishlist');
       return;
     }
+    if (role !== 'USER') {
+      toast.error('Only customers can use wishlist');
+      return;
+    }
     try {
-      await axiosInstance.post('/wishlist', { productId: product.id });
-      toast.success('Product added to wishlist');
+      if (isWishlisted) {
+        await axiosInstance.delete(`/wishlist/${product.id}`);
+        toast.success('Product removed from wishlist');
+        setIsWishlisted(false);
+      } else {
+        await axiosInstance.post('/wishlist', { productId: product.id });
+        toast.success('Product added to wishlist');
+        setIsWishlisted(true);
+      }
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to add to wishlist');
+      toast.error(err.response?.data?.message || 'Failed to update wishlist');
     }
   };
 
@@ -268,10 +290,14 @@ export default function ProductDetails() {
                 </button>
                 <button
                   onClick={handleAddToWishlist}
-                  className="flex justify-center items-center p-3 border border-slate-400 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-dark-850 text-slate-600 dark:text-slate-300 transition-colors"
-                  title="Add to Wishlist"
+                  className={`flex justify-center items-center p-3 border rounded-xl transition-colors cursor-pointer ${
+                    isWishlisted 
+                      ? 'border-red-200 bg-red-50 text-red-500 dark:border-red-900/50 dark:bg-red-900/20' 
+                      : 'border-slate-400 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-dark-850 text-slate-600 dark:text-slate-300'
+                  }`}
+                  title={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
                 >
-                  <Heart className="w-5 h-5" />
+                  <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
                 </button>
               </div>
             </div>

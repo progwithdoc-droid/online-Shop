@@ -2,6 +2,7 @@ import { eq, and, sql, desc, not } from 'drizzle-orm';
 import { db } from '../config/db.js';
 import { users, vendorProfiles, orders, products, complaints } from '../models/schema.js';
 import bcrypt from 'bcryptjs';
+import * as notificationService from './notification.service.js';
 
 export const getAdminDashboard = async () => {
   // 1. Total Users Count
@@ -219,6 +220,16 @@ export const createVendor = async ({ name, email, password, businessName, busine
 export const verifyVendor = async (profileId) => {
   const [updatedProfile] = await db.update(vendorProfiles).set({ isVerified: true, updatedAt: new Date() }).where(eq(vendorProfiles.id, profileId)).returning();
   if (!updatedProfile) throw new Error('Vendor profile not found');
+
+  // Send real-time notification to vendor
+  await notificationService.create(
+    updatedProfile.userId,
+    'VENDOR_VERIFIED',
+    'Account verified',
+    'Your vendor account is verified',
+    { profileId }
+  );
+
   return updatedProfile;
 };
 

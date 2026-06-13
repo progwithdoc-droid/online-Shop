@@ -1,4 +1,6 @@
 import * as orderService from '../services/order.service.js';
+import * as trackingService from '../services/tracking.service.js';
+import * as notificationService from '../services/notification.service.js';
 import { sendSuccess, sendError } from '../utils/apiResponse.js';
 
 export const createOrder = async (req, res) => {
@@ -58,8 +60,21 @@ export const getVendorOrders = async (req, res) => {
 
 export const updateVendorOrderStatus = async (req, res) => {
   try {
-    const { status } = req.body;
+    const { status, note, location } = req.body;
     const order = await orderService.updateVendorOrderStatus(req.user.id, req.params.id, status);
+
+    // Add tracking event
+    await trackingService.addEvent(req.params.id, status, note || `Order status updated by vendor`, req.user.id, location);
+
+    // Send notification to customer (order owner)
+    await notificationService.create(
+      order.userId,
+      'ORDER_STATUS_CHANGED',
+      'Order update',
+      `Your order #${order.id.substring(0, 8)} is now ${status}`,
+      { orderId: order.id, status }
+    );
+
     return sendSuccess(res, order, 'Order status updated successfully');
   } catch (error) {
     return sendError(res, error.message, 400);
@@ -77,8 +92,21 @@ export const getAdminOrders = async (req, res) => {
 
 export const updateAdminOrderStatus = async (req, res) => {
   try {
-    const { status } = req.body;
+    const { status, note, location } = req.body;
     const order = await orderService.updateAdminOrderStatus(req.params.id, status);
+
+    // Add tracking event
+    await trackingService.addEvent(req.params.id, status, note || `Order status updated by admin`, req.user.id, location);
+
+    // Send notification to customer (order owner)
+    await notificationService.create(
+      order.userId,
+      'ORDER_STATUS_CHANGED',
+      'Order update',
+      `Your order #${order.id.substring(0, 8)} is now ${status}`,
+      { orderId: order.id, status }
+    );
+
     return sendSuccess(res, order, 'Order status updated successfully');
   } catch (error) {
     return sendError(res, error.message, 400);

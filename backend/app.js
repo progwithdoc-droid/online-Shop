@@ -19,6 +19,8 @@ import complaintRoutes from './routes/complaint.routes.js';
 import addressRoutes from './routes/user.routes.js'; // address operations mapped to user routes
 import vendorRoutes from './routes/vendor.routes.js';
 import adminRoutes from './routes/admin.routes.js';
+import trackingRoutes from './routes/tracking.routes.js';
+import notificationRoutes from './routes/notification.routes.js';
 
 const app = express();
 
@@ -85,6 +87,8 @@ app.use('/api/complaints', complaintRoutes);
 app.use('/api/addresses', addressRoutes);
 app.use('/api/vendor', vendorRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/tracking', trackingRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Base Route
 app.get('/', (req, res) => {

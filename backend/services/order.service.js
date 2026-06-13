@@ -2,6 +2,9 @@ import { eq, and, desc, sql } from 'drizzle-orm';
 import { db } from '../config/db.js';
 import { orders, orderItems, products, cartItems, carts, addresses, returns, users } from '../models/schema.js';
 import { getCart, clearCart } from './cart.service.js';
+import * as trackingService from './tracking.service.js';
+import * as notificationService from './notification.service.js';
+import * as cache from './cache.service.js';
 
 // Phase 2 Razorpay Placeholders - Scaffolded
 /*
@@ -102,6 +105,23 @@ export const createOrder = async (userId, { addressId, paymentMethod }) => {
     await db.insert(orderItems).values(orderItemsValues);
     await clearCart(userId);
     createdOrder = order;
+  }
+
+  // Create PENDING tracking event
+  await trackingService.addEvent(createdOrder.id, 'PENDING', 'Order placed', userId);
+
+  // Send notification to customer
+  await notificationService.create(
+    userId,
+    'ORDER_PLACED',
+    'Order placed',
+    `Your order #${createdOrder.id.substring(0, 8)} has been placed`,
+    { orderId: createdOrder.id }
+  );
+
+  // Clear product details cache for ordered items (stock updated)
+  for (const item of cart.items) {
+    await cache.del(`products:detail:${item.product.id}`);
   }
 
   return createdOrder;
@@ -227,6 +247,24 @@ export const cancelOrder = async (orderId, userId) => {
     await db.update(orders).set({ status: 'CANCELLED' }).where(eq(orders.id, orderId));
   }
 
+  // Add CANCELLED tracking event
+  await trackingService.addEvent(orderId, 'CANCELLED', 'Cancelled by customer', userId);
+
+  // Send notification to customer
+  await notificationService.create(
+    userId,
+    'ORDER_STATUS_CHANGED',
+    'Order cancelled',
+    `Your order #${orderId.substring(0, 8)} has been cancelled`,
+    { orderId }
+  );
+
+  // Clear product details cache for items whose stock is restored
+  const items = await db.select().from(orderItems).where(eq(orderItems.orderId, orderId));
+  for (const item of items) {
+    await cache.del(`products:detail:${item.productId}`);
+  }
+
   return { success: true };
 };
 
@@ -280,6 +318,18 @@ export const requestReturn = async (userId, orderId, { orderItemId, reason }) =>
     await db.update(orders).set({ status: 'RETURN_REQUESTED' }).where(eq(orders.id, orderId));
     returnReq = inserted;
   }
+
+  // Add RETURN_REQUESTED tracking event
+  await trackingService.addEvent(orderId, 'RETURN_REQUESTED', 'Return requested', userId);
+
+  // Send notification to customer
+  await notificationService.create(
+    userId,
+    'RETURN_REQUESTED',
+    'Return requested',
+    `Return request submitted for #${orderId.substring(0, 8)}`,
+    { orderId, returnId: returnReq.id }
+  );
 
   return returnReq;
 };

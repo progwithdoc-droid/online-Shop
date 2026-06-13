@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import axiosInstance from '../../api/axios.js';
 import { formatCurrency, formatDate } from '../../utils/formatters.js';
 import toast from 'react-hot-toast';
@@ -220,7 +221,7 @@ export default function Orders() {
                 <div className="p-5 border-t bg-slate-50/50 dark:bg-dark-900/50 space-y-5 animate-fade-in">
                   
                   {/* Address & Payment Info */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
                     <div>
                       <h4 className="font-bold text-slate-500 uppercase tracking-wider mb-1">Shipping Details</h4>
                       <p className="text-slate-700 dark:text-slate-300 font-medium">
@@ -234,6 +235,15 @@ export default function Orders() {
                         Method: <span className="font-bold">{order.paymentMethod}</span> <br />
                         Status: <span className="font-bold text-brand-600 dark:text-brand-400">{order.paymentStatus}</span>
                       </p>
+                    </div>
+                    <div className="flex flex-col justify-center md:items-end">
+                      <Link
+                        to={`/user/orders/${order.id}/tracking`}
+                        className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold text-[11px] rounded-lg shadow-sm flex items-center justify-center space-x-1.5 transition-colors cursor-pointer w-full md:w-auto"
+                      >
+                        <Truck className="w-3.5 h-3.5 mr-1" />
+                        <span>Track Order</span>
+                      </Link>
                     </div>
                   </div>
 

@@ -149,6 +149,7 @@ export const orders = pgTable('orders', {
   paymentStatus: paymentStatusEnum('payment_status').default('UNPAID').notNull(),
   paymentMethod: varchar('payment_method', { length: 50 }),
   razorpayOrderId: text('razorpay_order_id'), // Phase 2 placeholder
+  razorpayPaymentId: text('razorpay_payment_id'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull()
 }, (table) => [
@@ -234,6 +235,19 @@ export const notifications = pgTable('notifications', {
   createdAt: timestamp('created_at').defaultNow().notNull()
 }, (table) => [
   index('notifications_user_idx').on(table.userId)
+]);
+
+// TRACKING EVENTS Table
+export const trackingEvents = pgTable('tracking_events', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  orderId: uuid('order_id').references(() => orders.id, { onDelete: 'cascade' }).notNull(),
+  updatedBy: uuid('updated_by').references(() => users.id, { onDelete: 'restrict' }).notNull(),
+  status: varchar('status', { length: 50 }).notNull(),
+  note: text('note'),
+  location: varchar('location', { length: 200 }),
+  timestamp: timestamp('timestamp').defaultNow().notNull()
+}, (table) => [
+  index('tracking_events_order_idx').on(table.orderId)
 ]);
 
 // Relationships definition for Drizzle queries
@@ -342,7 +356,8 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
     references: [addresses.id]
   }),
   items: many(orderItems),
-  returns: many(returns)
+  returns: many(returns),
+  trackingEvents: many(trackingEvents)
 }));
 
 export const orderItemsRelations = relations(orderItems, ({ one }) => ({
@@ -404,3 +419,15 @@ export const complaintsRelations = relations(complaints, ({ one }) => ({
     references: [orders.id]
   })
 }));
+
+export const trackingEventsRelations = relations(trackingEvents, ({ one }) => ({
+  order: one(orders, {
+    fields: [trackingEvents.orderId],
+    references: [orders.id]
+  }),
+  user: one(users, {
+    fields: [trackingEvents.updatedBy],
+    references: [users.id]
+  })
+}));
+

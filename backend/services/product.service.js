@@ -3,19 +3,26 @@ import { eq, and, gte, lte, like, or, sql, desc, asc, not } from 'drizzle-orm';
 import { db } from '../config/db.js';
 import { products, productMedia, reviews, categories, users, orderItems, orders } from '../models/schema.js';
 import cloudinary from '../config/cloudinary.js';
+import * as cache from './cache.service.js';
 
 // Get paginated and filtered product list
-export const getProducts = async ({
-  page = 1,
-  limit = 10,
-  category, // Category ID or Slug
-  vendorId,
-  minPrice,
-  maxPrice,
-  sortBy = 'createdAt', // price_asc, price_desc, rating_desc, createdAt
-  search,
-  inStock
-}) => {
+export const getProducts = async (filters = {}) => {
+  const cacheKey = `products:list:${JSON.stringify(filters)}`;
+  const cached = await cache.get(cacheKey);
+  if (cached) return cached;
+
+  const {
+    page = 1,
+    limit = 10,
+    category,
+    vendorId,
+    minPrice,
+    maxPrice,
+    sortBy = 'createdAt',
+    search,
+    inStock
+  } = filters;
+
   const parsedPage = parseInt(page) || 1;
   const parsedLimit = parseInt(limit) || 10;
   const offset = (parsedPage - 1) * parsedLimit;
@@ -131,7 +138,7 @@ export const getProducts = async ({
   const [countResult] = await db.select({ count: sql`count(*)::int` }).from(products).where(whereClause);
   const total = countResult?.count || 0;
 
-  return {
+  const result = {
     products: productsWithDetails,
     pagination: {
       total,
@@ -140,10 +147,16 @@ export const getProducts = async ({
       pages: Math.ceil(total / parsedLimit)
     }
   };
+  await cache.set(cacheKey, result, 120);
+  return result;
 };
 
 // Get single product with details
 export const getProductById = async (id) => {
+  const cacheKey = `products:detail:${id}`;
+  const cached = await cache.get(cacheKey);
+  if (cached) return cached;
+
   const [product] = await db.select().from(products).where(and(eq(products.id, id), eq(products.isDeleted, false))).limit(1);
   if (!product) throw new Error('Product not found');
 
@@ -177,7 +190,7 @@ export const getProductById = async (id) => {
     [categoryInfo] = await db.select().from(categories).where(eq(categories.id, product.categoryId)).limit(1);
   }
 
-  return {
+  const result = {
     ...product,
     media,
     avgRating: ratingStat?.avgRating || 0,
@@ -186,6 +199,8 @@ export const getProductById = async (id) => {
     vendor,
     category: categoryInfo
   };
+  await cache.set(cacheKey, result, 300);
+  return result;
 };
 
 // Create product
@@ -206,6 +221,9 @@ export const createProduct = async (vendorId, productData) => {
     slug: uniqueSlug,
     isDeleted: false
   }).returning();
+
+  // Invalidate product listings cache
+  await cache.delPattern('products:list:*');
 
   return product;
 };
@@ -236,6 +254,11 @@ export const updateProduct = async (productId, userId, role, productData) => {
   }
 
   const [updatedProduct] = await db.update(products).set(updateFields).where(eq(products.id, productId)).returning();
+
+  // Invalidate cache
+  await cache.del(`products:detail:${productId}`);
+  await cache.delPattern('products:list:*');
+
   return updatedProduct;
 };
 
@@ -249,6 +272,11 @@ export const deleteProduct = async (productId, userId, role) => {
   }
 
   await db.update(products).set({ isDeleted: true, updatedAt: new Date() }).where(eq(products.id, productId));
+
+  // Invalidate cache
+  await cache.del(`products:detail:${productId}`);
+  await cache.delPattern('products:list:*');
+
   return { success: true };
 };
 

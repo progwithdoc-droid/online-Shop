@@ -33,6 +33,15 @@ if (NODE_ENV === 'production' && cluster.isPrimary) {
     console.log(`[WORKER PROCESS ${process.pid}] running. Listening on port ${PORT} (Mode: ${NODE_ENV})`);
   });
   
+  // Initialize Socket.io and attach it to the notification service
+  import('./sockets/notification.socket.js').then(({ initSocket }) => {
+    import('./services/notification.service.js').then(({ setIo }) => {
+      const io = initSocket(server);
+      setIo(io);
+      console.log('🔔 Socket.io initialized and linked to Notification Service.');
+    });
+  });
+  
   // Handle server shutdown cleanups
   process.on('SIGTERM', () => {
     console.info('SIGTERM signal received. Gracefully closing HTTP server...');

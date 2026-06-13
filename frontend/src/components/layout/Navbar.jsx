@@ -5,6 +5,7 @@ import { useCartStore } from '../../store/cartStore.js';
 import { useTheme } from '../../hooks/useTheme.js';
 import { ShoppingCart, Heart, User, Sun, Moon, LogOut, LayoutDashboard, Shield, Menu, X } from 'lucide-react';
 import toast from 'react-hot-toast';
+import NotificationBell from '../common/NotificationBell.jsx';
 
 export default function Navbar() {
   const { user, logout, isAuthenticated, role } = useAuthStore();
@@ -68,6 +69,9 @@ export default function Navbar() {
 
             {isAuthenticated ? (
               <>
+                {/* Notifications */}
+                <NotificationBell />
+
                 {/* Wishlist */}
                 <Link
                   to="/wishlist"
@@ -179,6 +183,9 @@ export default function Navbar() {
             >
               {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
+
+            {/* Notifications - mobile quick access */}
+            {isAuthenticated && <NotificationBell />}
 
             {/* Cart icon with badge - quick access on mobile */}
             {isAuthenticated && (
