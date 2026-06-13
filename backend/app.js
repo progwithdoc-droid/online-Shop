@@ -56,7 +56,7 @@ if (process.env.NODE_ENV !== 'production') {
 // Rate Limiting
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 mins
-  max: 100, // 100 requests per IP
+  max: 150, // 100 requests per IP
   standardHeaders: true,
   legacyHeaders: false,
   message: { success: false, message: 'Too many requests from this IP, please try again after 15 minutes.' }

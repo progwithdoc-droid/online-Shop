@@ -265,7 +265,7 @@ export default function Orders() {
                         <div key={item.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-2 border-b last:border-0 gap-2">
                           <div className="flex items-center space-x-3">
                             <div className="w-10 h-10 rounded overflow-hidden bg-white border flex-shrink-0">
-                              <img src={primaryMedia.startsWith('http') ? primaryMedia : `${import.meta.env.VITE_API_URL.replace('/api', '')}${primaryMedia}`} alt="" className="w-full h-full object-cover" />
+                              <img src={primaryMedia.startsWith('http') ? primaryMedia : `${import.meta.env.VITE_API_URL.replace('/api', '')}${primaryMedia}`} alt="" loading="lazy" decoding="async" className="w-full h-full object-contain p-0.5" />
                             </div>
                             <div>
                               <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 block">{product.name}</span>

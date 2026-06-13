@@ -7,34 +7,15 @@ export const getAddresses = async (userId) => {
 };
 
 export const createAddress = async (userId, addressData) => {
-  let newAddress;
-  
-  if (db.transaction) {
-    newAddress = await db.transaction(async (tx) => {
-      // If setting as default, unset others first
-      if (addressData.isDefault) {
-        await tx.update(addresses).set({ isDefault: false }).where(eq(addresses.userId, userId));
-      }
-      
-      const [inserted] = await tx.insert(addresses).values({
-        ...addressData,
-        userId
-      }).returning();
-      
-      return inserted;
-    });
-  } else {
-    if (addressData.isDefault) {
-      await db.update(addresses).set({ isDefault: false }).where(eq(addresses.userId, userId));
-    }
-    const [inserted] = await db.insert(addresses).values({
-      ...addressData,
-      userId
-    }).returning();
-    newAddress = inserted;
+  if (addressData.isDefault) {
+    await db.update(addresses).set({ isDefault: false }).where(eq(addresses.userId, userId));
   }
+  const [inserted] = await db.insert(addresses).values({
+    ...addressData,
+    userId
+  }).returning();
   
-  return newAddress;
+  return inserted;
 };
 
 export const updateAddress = async (addressId, userId, addressData) => {
@@ -43,33 +24,16 @@ export const updateAddress = async (addressId, userId, addressData) => {
     throw new Error('Address not found');
   }
 
-  let updatedAddress;
-
-  if (db.transaction) {
-    updatedAddress = await db.transaction(async (tx) => {
-      if (addressData.isDefault) {
-        await tx.update(addresses).set({ isDefault: false }).where(eq(addresses.userId, userId));
-      }
-      
-      const [updated] = await tx.update(addresses)
-        .set(addressData)
-        .where(eq(addresses.id, addressId))
-        .returning();
-        
-      return updated;
-    });
-  } else {
-    if (addressData.isDefault) {
-      await db.update(addresses).set({ isDefault: false }).where(eq(addresses.userId, userId));
-    }
-    const [updated] = await db.update(addresses)
-      .set(addressData)
-      .where(eq(addresses.id, addressId))
-      .returning();
-    updatedAddress = updated;
+  if (addressData.isDefault) {
+    await db.update(addresses).set({ isDefault: false }).where(eq(addresses.userId, userId));
   }
-
-  return updatedAddress;
+  
+  const [updated] = await db.update(addresses)
+    .set(addressData)
+    .where(eq(addresses.id, addressId))
+    .returning();
+    
+  return updated;
 };
 
 export const deleteAddress = async (addressId, userId) => {
@@ -88,15 +52,7 @@ export const setDefaultAddress = async (addressId, userId) => {
     throw new Error('Address not found');
   }
 
-  if (db.transaction) {
-    await db.transaction(async (tx) => {
-      await tx.update(addresses).set({ isDefault: false }).where(eq(addresses.userId, userId));
-      await tx.update(addresses).set({ isDefault: true }).where(eq(addresses.id, addressId));
-    });
-  } else {
-    await db.update(addresses).set({ isDefault: false }).where(eq(addresses.userId, userId));
-    await db.update(addresses).set({ isDefault: true }).where(eq(addresses.id, addressId));
-  }
-
+  await db.update(addresses).set({ isDefault: false }).where(eq(addresses.userId, userId));
+  await db.update(addresses).set({ isDefault: true }).where(eq(addresses.id, addressId));
   return { success: true };
 };

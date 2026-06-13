@@ -108,7 +108,9 @@ export default function Cart() {
                     <img
                       src={primaryMedia.startsWith('http') ? primaryMedia : `${import.meta.env.VITE_API_URL.replace('/api', '')}${primaryMedia}`}
                       alt={product.name}
-                      className="w-full h-full object-cover"
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-contain p-1"
                     />
                   </div>
                   <div>

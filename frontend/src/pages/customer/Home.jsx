@@ -19,6 +19,7 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
+  const [wishlistItems, setWishlistItems] = useState(new Set());
 
   const { isAuthenticated, role, user } = useAuthStore();
   const fetchCart = useCartStore((state) => state.fetchCart);
@@ -29,6 +30,17 @@ export default function Home() {
     { name: 'Fashion', slug: 'fashion' },
     { name: 'Home & Kitchen', slug: 'home-kitchen' }
   ];
+
+  const fetchWishlist = async () => {
+    if (isAuthenticated && role === 'USER') {
+      try {
+        const response = await axiosInstance.get('/wishlist');
+        const items = response.data.data || [];
+        const ids = new Set(items.map(w => w.product?.id).filter(Boolean));
+        setWishlistItems(ids);
+      } catch (err) {}
+    }
+  };
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -56,7 +68,8 @@ export default function Home() {
 
   useEffect(() => {
     fetchProducts();
-  }, [category, sortBy, inStock, page]);
+    fetchWishlist();
+  }, [category, sortBy, inStock, page, isAuthenticated, role]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -98,11 +111,30 @@ export default function Home() {
       toast.error('Please login to add items to wishlist');
       return;
     }
+    if (role !== 'USER') {
+      toast.error('Only customers can use wishlist');
+      return;
+    }
     try {
-      await axiosInstance.post('/wishlist', { productId });
-      toast.success('Product added to wishlist');
+      if (wishlistItems.has(productId)) {
+        await axiosInstance.delete(`/wishlist/${productId}`);
+        setWishlistItems(prev => {
+          const next = new Set(prev);
+          next.delete(productId);
+          return next;
+        });
+        toast.success('Removed from wishlist');
+      } else {
+        await axiosInstance.post('/wishlist', { productId });
+        setWishlistItems(prev => {
+          const next = new Set(prev);
+          next.add(productId);
+          return next;
+        });
+        toast.success('Added to wishlist');
+      }
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to add to wishlist');
+      toast.error(err.response?.data?.message || 'Failed to update wishlist');
     }
   };
 
@@ -357,10 +389,19 @@ export default function Home() {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
           {[...Array(8)].map((_, i) => (
-            <div key={i} className="animate-pulse space-y-4">
-              <div className="aspect-square bg-slate-200 dark:bg-dark-850 rounded-2xl w-full"></div>
-              <div className="h-4 bg-slate-200 dark:bg-dark-850 rounded w-2/3"></div>
-              <div className="h-4 bg-slate-200 dark:bg-dark-850 rounded w-1/2"></div>
+            <div key={i} className="flex flex-col bg-white dark:bg-dark-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm animate-pulse">
+              <div className="aspect-square w-full bg-slate-200 dark:bg-dark-850"></div>
+              <div className="p-5 flex-1 flex flex-col justify-between">
+                <div>
+                  <div className="h-3 w-1/4 bg-slate-200 dark:bg-dark-850 rounded mb-2"></div>
+                  <div className="h-4 w-3/4 bg-slate-200 dark:bg-dark-850 rounded mb-3"></div>
+                  <div className="h-3 w-20 bg-slate-200 dark:bg-dark-850 rounded mb-4"></div>
+                </div>
+                <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4 mt-2">
+                  <div className="h-5 w-16 bg-slate-200 dark:bg-dark-850 rounded"></div>
+                  <div className="h-10 w-10 bg-slate-200 dark:bg-dark-850 rounded-xl"></div>
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -373,6 +414,7 @@ export default function Home() {
           {products.map((product) => {
             const hasDiscount = parseFloat(product.compareAtPrice) > parseFloat(product.price);
             const isOutOfStock = product.stock <= 0;
+            const isWishlisted = wishlistItems.has(product.id);
 
             // Media extraction
             const primaryMedia = product.media && product.media.length > 0
@@ -390,7 +432,9 @@ export default function Home() {
                     <img
                       src={primaryMedia.startsWith('http') ? primaryMedia : `${import.meta.env.VITE_API_URL.replace('/api', '')}${primaryMedia}`}
                       alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300"
                     />
                   </Link>
 
@@ -404,10 +448,14 @@ export default function Home() {
                   {/* Wishlist Button */}
                   <button
                     onClick={() => handleAddToWishlist(product.id)}
-                    className="absolute top-3 right-3 p-2 bg-white/80 dark:bg-dark-900/80 hover:bg-white dark:hover:bg-dark-900 rounded-full text-slate-500 hover:text-red-500 shadow-sm transition-colors"
-                    title="Add to Wishlist"
+                    className={`absolute top-3 right-3 p-2 rounded-full shadow-sm transition-colors ${
+                      isWishlisted
+                        ? 'bg-red-50 text-red-500 dark:bg-red-900/20'
+                        : 'bg-white/80 dark:bg-dark-900/80 text-slate-500 hover:bg-white dark:hover:bg-dark-900 hover:text-red-500'
+                    }`}
+                    title={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
                   >
-                    <Heart className="w-4 h-4" />
+                    <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
                   </button>
                 </div>
 

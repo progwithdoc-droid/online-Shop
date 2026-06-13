@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../api/axios.js';
 import { formatCurrency } from '../../utils/formatters.js';
 import toast from 'react-hot-toast';
-import { ShoppingBag, Plus, Trash2, Edit, Camera, Film, Loader2, X, Eye } from 'lucide-react';
+import { ShoppingBag, Plus, Trash2, Edit, Camera, Film, Loader2, X, Eye, Package, ChevronDown, Info } from 'lucide-react';
 
 export default function VendorProducts() {
   const [products, setProducts] = useState([]);
@@ -29,6 +29,8 @@ export default function VendorProducts() {
   const [selectedImages, setSelectedImages] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [uploadingMedia, setUploadingMedia] = useState(false);
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [videoPreview, setVideoPreview] = useState(null);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -117,6 +119,10 @@ export default function VendorProducts() {
         toast.success('Product created successfully! Upload media next.');
         // Auto open media upload for new product
         setSelectedProduct(res.data.data);
+        setSelectedImages([]);
+        setImagePreviews([]);
+        setSelectedVideo(null);
+        setVideoPreview(null);
         setShowMediaModal(true);
       }
       setShowFormModal(false);
@@ -142,8 +148,65 @@ export default function VendorProducts() {
   const handleOpenMediaModal = (product) => {
     setSelectedProduct(product);
     setSelectedImages([]);
+    setImagePreviews([]);
     setSelectedVideo(null);
+    setVideoPreview(null);
     setShowMediaModal(true);
+  };
+
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    
+    // Enforce Max 8 images limit total
+    const existingImagesCount = selectedProduct?.media?.filter(m => m.type === 'IMAGE').length || 0;
+    if (existingImagesCount + files.length > 8) {
+      toast.error(`Exceeds maximum limit of 8 images for this product. Already has ${existingImagesCount} images.`);
+      return;
+    }
+    
+    setSelectedImages(files);
+    const previews = files.map(file => URL.createObjectURL(file));
+    setImagePreviews(previews);
+  };
+
+  const handleRemoveSelectedImage = (index) => {
+    const newImages = [...selectedImages];
+    newImages.splice(index, 1);
+    setSelectedImages(newImages);
+
+    const newPreviews = [...imagePreviews];
+    URL.revokeObjectURL(newPreviews[index]);
+    newPreviews.splice(index, 1);
+    setImagePreviews(newPreviews);
+  };
+
+  const handleVideoChange = (e) => {
+    const file = e.target.files?.[0] || null;
+    if (!file) {
+      setSelectedVideo(null);
+      setVideoPreview(null);
+      return;
+    }
+    setSelectedVideo(file);
+    setVideoPreview(URL.createObjectURL(file));
+  };
+
+  const handleRemoveSelectedVideo = () => {
+    setSelectedVideo(null);
+    if (videoPreview) {
+      URL.revokeObjectURL(videoPreview);
+    }
+    setVideoPreview(null);
+  };
+
+  const handleCloseMediaModal = () => {
+    imagePreviews.forEach(url => URL.revokeObjectURL(url));
+    if (videoPreview) URL.revokeObjectURL(videoPreview);
+    setSelectedImages([]);
+    setImagePreviews([]);
+    setSelectedVideo(null);
+    setVideoPreview(null);
+    setShowMediaModal(false);
   };
 
   const handleUploadMedia = async (e) => {
@@ -167,6 +230,14 @@ export default function VendorProducts() {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       toast.success('Media uploaded successfully!');
+      
+      // Clean up previews
+      imagePreviews.forEach(url => URL.revokeObjectURL(url));
+      if (videoPreview) URL.revokeObjectURL(videoPreview);
+      setSelectedImages([]);
+      setImagePreviews([]);
+      setSelectedVideo(null);
+      setVideoPreview(null);
       setShowMediaModal(false);
       fetchProducts();
     } catch (err) {
@@ -227,11 +298,15 @@ export default function VendorProducts() {
                 className="bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between"
               >
                 <div className="aspect-video w-full bg-slate-50 dark:bg-dark-950 relative border-b">
-                  <img
-                    src={primaryImage.startsWith('http') ? primaryImage : `${import.meta.env.VITE_API_URL.replace('/api', '')}${primaryImage}`}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
+                  <a href={`/product/${product.id}`} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
+                    <img
+                      src={primaryImage.startsWith('http') ? primaryImage : `${import.meta.env.VITE_API_URL.replace('/api', '')}${primaryImage}`}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-contain p-2"
+                    />
+                  </a>
                   
                   {/* Status Indicator */}
                   <span className={`absolute top-3 left-3 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${
@@ -246,7 +321,11 @@ export default function VendorProducts() {
                 <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                   <div className="space-y-1">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{product.category?.name || 'General'}</span>
-                    <h3 className="font-bold text-slate-800 dark:text-slate-100 line-clamp-1">{product.name}</h3>
+                    <h3 className="font-bold text-slate-800 dark:text-slate-100 line-clamp-1 hover:text-brand-600 transition-colors">
+                      <a href={`/product/${product.id}`} target="_blank" rel="noopener noreferrer">
+                        {product.name}
+                      </a>
+                    </h3>
                     <p className="text-xs text-slate-500 line-clamp-2">{product.description}</p>
                   </div>
 
@@ -265,6 +344,15 @@ export default function VendorProducts() {
                       Gallery ({product.media?.length || 0})
                     </button>
                     <div className="flex space-x-1">
+                      <a
+                        href={`/product/${product.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-1.5 border hover:bg-slate-50 dark:hover:bg-dark-850 text-slate-500 rounded-lg transition-colors cursor-pointer flex items-center justify-center"
+                        title="View Public Page (Opens in new tab)"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                      </a>
                       <button
                         onClick={() => handleOpenEditModal(product)}
                         className="p-1.5 border hover:bg-slate-50 dark:hover:bg-dark-850 text-slate-500 rounded-lg transition-colors cursor-pointer"
@@ -290,128 +378,179 @@ export default function VendorProducts() {
 
       {/* 1. Form Modal (Create or Edit Product details) */}
       {showFormModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 dark:bg-black/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-fade-in">
           <form
             onSubmit={handleSaveProduct}
-            className="w-full max-w-2xl bg-white dark:bg-dark-900 border p-6 rounded-2xl space-y-4 shadow-2xl overflow-y-auto max-h-[90vh]"
+            className="w-full max-w-3xl bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-slide-up"
           >
-            <div>
-              <h3 className="heading-display text-lg font-bold">{selectedProduct ? 'Edit Product Details' : 'Create New Product'}</h3>
-              <p className="text-xs text-slate-400">Products are active immediately but will only display to customers if vendor is verified.</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Product Name</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Apex smart watch"
-                  className="w-full px-3 py-2 bg-slate-55 dark:bg-dark-950 border rounded-lg text-sm focus:outline-none"
-                  required
-                />
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-dark-950/50">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-brand-100 dark:bg-brand-900/50 flex items-center justify-center">
+                  <Package className="w-5 h-5 text-brand-600 dark:text-brand-400" />
+                </div>
+                <div>
+                  <h3 className="heading-display text-xl font-bold text-slate-800 dark:text-slate-100">
+                    {selectedProduct ? 'Edit Product' : 'Create New Product'}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    Fill in the details below to list your product on the marketplace.
+                  </p>
+                </div>
               </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Category</label>
-                <select
-                  value={categoryId}
-                  onChange={(e) => setCategoryId(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-55 dark:bg-dark-950 border rounded-lg text-sm focus:outline-none"
-                >
-                  <option value="">No Category</option>
-                  {categories.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Price (USD)</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  placeholder="49.99"
-                  className="w-full px-3 py-2 bg-slate-55 dark:bg-dark-950 border rounded-lg text-sm focus:outline-none"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Compare-at Price (slashed price)</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={compareAtPrice}
-                  onChange={(e) => setCompareAtPrice(e.target.value)}
-                  placeholder="79.99"
-                  className="w-full px-3 py-2 bg-slate-55 dark:bg-dark-950 border rounded-lg text-sm focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Stock Quantity</label>
-                <input
-                  type="number"
-                  value={stock}
-                  onChange={(e) => setStock(e.target.value)}
-                  placeholder="100"
-                  className="w-full px-3 py-2 bg-slate-55 dark:bg-dark-950 border rounded-lg text-sm focus:outline-none"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">SKU ID</label>
-                <input
-                  type="text"
-                  value={sku}
-                  onChange={(e) => setSku(e.target.value)}
-                  placeholder="APX-WT-900"
-                  className="w-full px-3 py-2 bg-slate-55 dark:bg-dark-950 border rounded-lg text-sm focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Return Window Days</label>
-                <input
-                  type="number"
-                  value={returnWindowDays}
-                  onChange={(e) => setReturnWindowDays(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-55 dark:bg-dark-950 border rounded-lg text-sm focus:outline-none"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Description</label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={3}
-                placeholder="Product characteristics details..."
-                className="w-full px-3 py-2 bg-slate-55 dark:bg-dark-950 border rounded-lg text-sm focus:outline-none resize-none"
-              />
-            </div>
-
-            <div className="flex space-x-3 pt-2">
               <button
                 type="button"
                 onClick={() => setShowFormModal(false)}
-                className="flex-1 py-2.5 border rounded-lg text-sm font-semibold hover:bg-slate-5"
+                className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-dark-800 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 custom-scrollbar">
+              
+              {/* Section: Basic Info */}
+              <div className="space-y-5">
+                <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-2">Basic Information</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">Product Name <span className="text-red-500">*</span></label>
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="e.g. Apex Smart Watch Series 5"
+                      className="w-full px-4 py-3 bg-slate-50 dark:bg-dark-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all placeholder-slate-400"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">Category</label>
+                    <div className="relative">
+                      <select
+                        value={categoryId}
+                        onChange={(e) => setCategoryId(e.target.value)}
+                        className="w-full px-4 py-3 bg-slate-50 dark:bg-dark-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all appearance-none"
+                      >
+                        <option value="">Select a category</option>
+                        {categories.map(c => (
+                          <option key={c.id} value={c.id}>{c.name}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">Description</label>
+                    <textarea
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      rows={4}
+                      placeholder="Describe your product's key features, specifications, and benefits..."
+                      className="w-full px-4 py-3 bg-slate-50 dark:bg-dark-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all placeholder-slate-400 resize-y"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section: Pricing & Inventory */}
+              <div className="space-y-5">
+                <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-2">Pricing & Inventory</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">Price (USD) <span className="text-red-500">*</span></label>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">$</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={price}
+                        onChange={(e) => setPrice(e.target.value)}
+                        placeholder="49.99"
+                        className="w-full pl-8 pr-4 py-3 bg-slate-50 dark:bg-dark-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all font-medium"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1">
+                      Compare-at Price
+                      <span className="group relative cursor-help">
+                        <Info className="w-3.5 h-3.5 text-slate-400" />
+                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-800 text-white text-[10px] rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity text-center z-10 leading-relaxed shadow-lg">Original price before discount. Will be shown with a strikethrough.</span>
+                      </span>
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">$</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={compareAtPrice}
+                        onChange={(e) => setCompareAtPrice(e.target.value)}
+                        placeholder="79.99"
+                        className="w-full pl-8 pr-4 py-3 bg-slate-50 dark:bg-dark-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">Stock Quantity <span className="text-red-500">*</span></label>
+                    <input
+                      type="number"
+                      value={stock}
+                      onChange={(e) => setStock(e.target.value)}
+                      placeholder="100"
+                      className="w-full px-4 py-3 bg-slate-50 dark:bg-dark-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">SKU (Stock Keeping Unit)</label>
+                    <input
+                      type="text"
+                      value={sku}
+                      onChange={(e) => setSku(e.target.value)}
+                      placeholder="APX-WT-900"
+                      className="w-full px-4 py-3 bg-slate-50 dark:bg-dark-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all font-mono uppercase"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">Return Window (Days) <span className="text-red-500">*</span></label>
+                    <input
+                      type="number"
+                      value={returnWindowDays}
+                      onChange={(e) => setReturnWindowDays(e.target.value)}
+                      placeholder="7"
+                      className="w-full px-4 py-3 bg-slate-50 dark:bg-dark-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-dark-950/50 flex justify-end space-x-3">
+              <button
+                type="button"
+                onClick={() => setShowFormModal(false)}
+                className="px-6 py-2.5 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-dark-800 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={savingProduct}
-                className="flex-1 py-2.5 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white font-bold rounded-lg text-sm"
+                className="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 active:bg-brand-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl text-sm shadow-sm hover:shadow transition-all flex items-center space-x-2"
               >
-                {savingProduct ? 'Saving...' : 'Save Details'}
+                {savingProduct && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+                <span>{savingProduct ? 'Saving...' : selectedProduct ? 'Save Changes' : 'Create Product'}</span>
               </button>
             </div>
           </form>
@@ -420,96 +559,175 @@ export default function VendorProducts() {
 
       {/* 2. Media Modal (Manage Gallery & Upload media) */}
       {showMediaModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-2xl bg-white dark:bg-dark-900 border p-6 rounded-2xl space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-start border-b pb-4">
-              <div>
-                <h3 className="heading-display text-lg font-bold">Product Media Gallery</h3>
-                <p className="text-xs text-slate-400">{selectedProduct?.name}</p>
+        <div className="fixed inset-0 z-50 bg-slate-900/40 dark:bg-black/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-fade-in">
+          <div className="w-full max-w-3xl bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl flex flex-col max-h-[90vh] animate-slide-up overflow-hidden">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-dark-950/50">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-brand-100 dark:bg-brand-900/50 flex items-center justify-center">
+                  <Camera className="w-5 h-5 text-brand-600 dark:text-brand-400" />
+                </div>
+                <div>
+                  <h3 className="heading-display text-xl font-bold text-slate-800 dark:text-slate-100">
+                    Product Media Gallery
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    {selectedProduct?.name}
+                  </p>
+                </div>
               </div>
-              <button onClick={() => setShowMediaModal(false)} className="p-1 hover:bg-slate-100 rounded-full">
-                <X className="w-5 h-5 text-slate-500" />
+              <button onClick={handleCloseMediaModal} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-dark-800 rounded-full transition-colors">
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* List current media */}
-            <div className="space-y-2">
-              <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Current Media ({selectedProduct?.media?.length || 0})</h4>
-              {selectedProduct?.media?.length === 0 ? (
-                <p className="text-xs text-slate-405 italic">No images or videos uploaded for this product yet.</p>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                  {selectedProduct?.media?.map((med) => (
-                    <div key={med.id} className="relative aspect-square border rounded-lg overflow-hidden group">
-                      <img src={med.type === 'VIDEO' ? 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100' : (med.url.startsWith('http') ? med.url : `${import.meta.env.VITE_API_URL.replace('/api', '')}${med.url}`)} alt="" className="w-full h-full object-cover" />
-                      {med.type === 'VIDEO' && (
-                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center text-white">
-                          <Film className="w-5 h-5" />
-                        </div>
-                      )}
-                      
-                      {/* Delete button hover overlay */}
-                      <button
-                        onClick={() => handleDeleteMedia(selectedProduct.id, med.id)}
-                        className="absolute inset-0 bg-red-600/70 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-bold transition-opacity"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Upload media form */}
-            <form onSubmit={handleUploadMedia} className="space-y-4 pt-4 border-t">
-              <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Upload New Media</h4>
+            <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 custom-scrollbar">
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Images field */}
-                <div className="p-4 border border-dashed rounded-xl space-y-2">
-                  <span className="text-xs font-bold flex items-center text-slate-600">
-                    <Camera className="w-4 h-4 mr-1 text-slate-500" />
-                    Select Images (Max 8)
-                  </span>
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={(e) => setSelectedImages(Array.from(e.target.files))}
-                    className="w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100"
-                  />
-                  {selectedImages.length > 0 && (
-                    <span className="text-[10px] text-brand-600 block">{selectedImages.length} images selected</span>
-                  )}
+              {/* List current media */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+                  <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">Current Media <span className="text-slate-400 font-normal">({selectedProduct?.media?.length || 0})</span></h4>
                 </div>
-
-                {/* Video field */}
-                <div className="p-4 border border-dashed rounded-xl space-y-2">
-                  <span className="text-xs font-bold flex items-center text-slate-600">
-                    <Film className="w-4 h-4 mr-1 text-slate-500" />
-                    Select Video (Max 1)
-                  </span>
-                  <input
-                    type="file"
-                    accept="video/*"
-                    onChange={(e) => setSelectedVideo(e.target.files?.[0] || null)}
-                    className="w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100"
-                  />
-                  {selectedVideo && (
-                    <span className="text-[10px] text-brand-600 block">{selectedVideo.name} selected</span>
-                  )}
-                </div>
+                {selectedProduct?.media?.length === 0 ? (
+                  <div className="p-8 text-center bg-slate-50 dark:bg-dark-950 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
+                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">No images or videos uploaded yet.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {selectedProduct?.media?.map((med) => (
+                      <div key={med.id} className="relative aspect-square border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden group shadow-sm bg-white dark:bg-dark-900">
+                        <img src={med.type === 'VIDEO' ? 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100' : (med.url.startsWith('http') ? med.url : `${import.meta.env.VITE_API_URL.replace('/api', '')}${med.url}`)} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                        {med.type === 'VIDEO' && (
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white">
+                            <Film className="w-6 h-6 drop-shadow-md" />
+                          </div>
+                        )}
+                        
+                        {/* Delete button hover overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-3">
+                          <button
+                            onClick={() => handleDeleteMedia(selectedProduct.id, med.id)}
+                            className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg shadow-lg flex items-center space-x-1 transition-transform transform scale-95 group-hover:scale-100"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Delete</span>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              <button
-                type="submit"
-                disabled={uploadingMedia}
-                className="w-full py-2.5 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white font-bold rounded-lg text-sm cursor-pointer"
-              >
-                {uploadingMedia ? 'Uploading Files...' : 'Upload Media Files'}
-              </button>
-            </form>
+              {/* Upload media form */}
+              <form onSubmit={handleUploadMedia} className="space-y-6">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+                  <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">Upload New Media</h4>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Images field */}
+                  <div className="relative group">
+                    <input
+                      type="file"
+                      id="image-upload-input"
+                      multiple
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="p-6 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-dark-950 group-hover:border-brand-500 group-hover:bg-brand-50 dark:group-hover:bg-brand-900/10 transition-all text-center flex flex-col items-center justify-center h-full min-h-[140px]">
+                      <div className="w-12 h-12 bg-white dark:bg-dark-900 rounded-full shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <Camera className="w-6 h-6 text-slate-400 group-hover:text-brand-500 transition-colors" />
+                      </div>
+                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-1">Add Images</span>
+                      <span className="text-[10px] text-slate-400 font-medium">JPG, PNG, WEBP (Max 8)</span>
+                    </div>
+                  </div>
+
+                  {/* Video field */}
+                  <div className="relative group">
+                    <input
+                      type="file"
+                      id="video-upload-input"
+                      accept="video/*"
+                      onChange={handleVideoChange}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="p-6 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-dark-950 group-hover:border-brand-500 group-hover:bg-brand-50 dark:group-hover:bg-brand-900/10 transition-all text-center flex flex-col items-center justify-center h-full min-h-[140px]">
+                      <div className="w-12 h-12 bg-white dark:bg-dark-900 rounded-full shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <Film className="w-6 h-6 text-slate-400 group-hover:text-brand-500 transition-colors" />
+                      </div>
+                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200 mb-1">Add Product Video</span>
+                      <span className="text-[10px] text-slate-400 font-medium">MP4, MOV (Max 1)</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Preview Section */}
+                {(imagePreviews.length > 0 || videoPreview) && (
+                  <div className="bg-slate-50 dark:bg-dark-950 rounded-2xl p-4 md:p-6 border border-slate-100 dark:border-slate-800 space-y-5 animate-fade-in">
+                    
+                    {/* Local Image Previews */}
+                    {imagePreviews.length > 0 && (
+                      <div className="space-y-3">
+                        <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Images to Upload ({imagePreviews.length})</span>
+                        <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
+                          {imagePreviews.map((url, idx) => (
+                            <div key={idx} className="relative aspect-square rounded-xl overflow-hidden group/thumb shadow-sm border border-slate-200 dark:border-slate-700 bg-white dark:bg-dark-900">
+                              <img src={url} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveSelectedImage(idx)}
+                                className="absolute -top-2 -right-2 p-1.5 bg-white dark:bg-dark-800 hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500 rounded-full shadow-md opacity-0 group-hover/thumb:opacity-100 group-hover/thumb:top-1 group-hover/thumb:right-1 transition-all z-10 border border-slate-100 dark:border-slate-700"
+                                title="Remove"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Local Video Preview */}
+                    {videoPreview && (
+                      <div className="space-y-3">
+                        <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Video to Upload</span>
+                        <div className="relative bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3 flex items-center justify-between shadow-sm">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 bg-brand-50 dark:bg-brand-900/30 rounded-lg flex items-center justify-center">
+                              <Film className="w-5 h-5 text-brand-600 dark:text-brand-400" />
+                            </div>
+                            <span className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate max-w-[200px] md:max-w-[300px]">{selectedVideo?.name}</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleRemoveSelectedVideo}
+                            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Upload Action */}
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={uploadingMedia || (imagePreviews.length === 0 && !videoPreview)}
+                    className="w-full py-3.5 bg-brand-600 hover:bg-brand-700 active:bg-brand-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl text-sm shadow-sm hover:shadow transition-all flex items-center justify-center space-x-2"
+                  >
+                    {uploadingMedia && <Loader2 className="w-4 h-4 animate-spin" />}
+                    <span>{uploadingMedia ? 'Uploading Files...' : 'Confirm Upload'}</span>
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

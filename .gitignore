@@ -28,3 +28,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+backend/seed_vendor_products.js
+backend/test_db.js
+images

@@ -129,10 +129,14 @@ export const getVendorDashboard = async (vendorId) => {
 };
 
 export const getVendorProducts = async (vendorId) => {
-  return db.select()
-    .from(products)
-    .where(and(eq(products.vendorId, vendorId), eq(products.isDeleted, false)))
-    .orderBy(desc(products.createdAt));
+  return db.query.products.findMany({
+    where: and(eq(products.vendorId, vendorId), eq(products.isDeleted, false)),
+    with: {
+      media: true,
+      category: true,
+    },
+    orderBy: [desc(products.createdAt)],
+  });
 };
 
 export const getVendorSalesAnalytics = async (vendorId, { startDate, endDate }) => {

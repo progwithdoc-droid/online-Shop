@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import axiosInstance from '../../api/axios.js';
 import { useCartStore } from '../../store/cartStore.js';
 import { useAuthStore } from '../../store/authStore.js';
@@ -167,14 +167,16 @@ export default function ProductDetails() {
               <video
                 src={activeMedia.url.startsWith('http') ? activeMedia.url : `${import.meta.env.VITE_API_URL.replace('/api', '')}${activeMedia.url}`}
                 controls
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain p-2"
                 poster={product.media?.find(m => m.type === 'IMAGE')?.url}
               />
             ) : (
               <img
                 src={activeMedia?.url?.startsWith('http') ? activeMedia.url : `${import.meta.env.VITE_API_URL.replace('/api', '')}${activeMedia?.url}`}
                 alt={product.name}
-                className="w-full h-full object-cover"
+                loading="eager"
+                decoding="async"
+                className="w-full h-full object-contain p-4"
               />
             )}
           </div>
@@ -193,7 +195,9 @@ export default function ProductDetails() {
                   <img
                     src={med.type === 'VIDEO' ? (product.media.find(m => m.type === 'IMAGE')?.url || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100') : (med.url.startsWith('http') ? med.url : `${import.meta.env.VITE_API_URL.replace('/api', '')}${med.url}`)}
                     alt=""
-                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-contain p-1"
                   />
                   {med.type === 'VIDEO' && (
                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white">

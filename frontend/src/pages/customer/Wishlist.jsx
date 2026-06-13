@@ -105,7 +105,9 @@ export default function Wishlist() {
                   <img
                       src={primaryMedia.startsWith('http') ? primaryMedia : `${import.meta.env.VITE_API_URL.replace('/api', '')}${primaryMedia}`}
                       alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300"
                     />
                   </Link>
                   
