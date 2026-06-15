@@ -297,14 +297,14 @@ export default function VendorProducts() {
                 key={product.id}
                 className="bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between"
               >
-                <div className="aspect-video w-full bg-slate-50 dark:bg-dark-950 relative border-b">
-                  <a href={`/product/${product.id}`} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
+                <div className="aspect-square w-full bg-slate-100 dark:bg-dark-850 relative border-b border-slate-200 dark:border-slate-800 overflow-hidden">
+                  <a href={`/product/${product.id}`} target="_blank" rel="noopener noreferrer" className="absolute inset-0">
                     <img
                       src={primaryImage.startsWith('http') ? primaryImage : `${import.meta.env.VITE_API_URL.replace('/api', '')}${primaryImage}`}
                       alt=""
                       loading="lazy"
                       decoding="async"
-                      className="w-full h-full object-contain p-2"
+                      className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
                     />
                   </a>
                   
@@ -597,7 +597,7 @@ export default function VendorProducts() {
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     {selectedProduct?.media?.map((med) => (
                       <div key={med.id} className="relative aspect-square border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden group shadow-sm bg-white dark:bg-dark-900">
-                        <img src={med.type === 'VIDEO' ? 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100' : (med.url.startsWith('http') ? med.url : `${import.meta.env.VITE_API_URL.replace('/api', '')}${med.url}`)} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                        <img src={med.type === 'VIDEO' ? 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100' : (med.url.startsWith('http') ? med.url : `${import.meta.env.VITE_API_URL.replace('/api', '')}${med.url}`)} alt="" loading="lazy" decoding="async" className="w-full h-full object-contain" />
                         {med.type === 'VIDEO' && (
                           <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white">
                             <Film className="w-6 h-6 drop-shadow-md" />
@@ -676,7 +676,7 @@ export default function VendorProducts() {
                         <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
                           {imagePreviews.map((url, idx) => (
                             <div key={idx} className="relative aspect-square rounded-xl overflow-hidden group/thumb shadow-sm border border-slate-200 dark:border-slate-700 bg-white dark:bg-dark-900">
-                              <img src={url} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                              <img src={url} alt="" loading="lazy" decoding="async" className="w-full h-full object-contain" />
                               <button
                                 type="button"
                                 onClick={() => handleRemoveSelectedImage(idx)}

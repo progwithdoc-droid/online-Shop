@@ -427,14 +427,14 @@ export default function Home() {
                 className="group relative flex flex-col bg-white dark:bg-dark-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
               >
                 {/* Media Image container */}
-                <div className="aspect-square w-full bg-slate-50 dark:bg-dark-950 relative overflow-hidden">
-                  <Link to={`/product/${product.id}`}>
+                <div className="aspect-square w-full overflow-hidden relative bg-slate-100 dark:bg-dark-850">
+                  <Link to={`/product/${product.id}`} className="absolute inset-0">
                     <img
                       src={primaryMedia.startsWith('http') ? primaryMedia : `${import.meta.env.VITE_API_URL.replace('/api', '')}${primaryMedia}`}
                       alt={product.name}
                       loading="lazy"
                       decoding="async"
-                      className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                     />
                   </Link>
 

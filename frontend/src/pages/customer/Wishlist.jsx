@@ -89,9 +89,9 @@ export default function Wishlist() {
         {wishlist.map((item) => {
           const product = item.product;
           if (!product) return null;
-          const primaryMedia = product.media && product.media.length > 0
+          const primaryMedia = product.thumbnail || (product.media && product.media.length > 0
             ? product.media.find(m => m.type === 'IMAGE')?.url || product.media[0].url
-            : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300';
+            : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300');
           const isOutOfStock = product.stock <= 0;
 
           return (
@@ -100,14 +100,14 @@ export default function Wishlist() {
               className="flex flex-col bg-white dark:bg-dark-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 relative group"
             >
               {/* Media Thumbnail */}
-              <div className="aspect-square w-full bg-slate-50 dark:bg-dark-950 overflow-hidden relative">
-                <Link to={`/product/${product.id}`}>
+              <div className="aspect-square w-full overflow-hidden relative bg-slate-100 dark:bg-dark-850">
+                <Link to={`/product/${product.id}`} className="absolute inset-0">
                   <img
                       src={primaryMedia.startsWith('http') ? primaryMedia : `${import.meta.env.VITE_API_URL.replace('/api', '')}${primaryMedia}`}
                       alt={product.name}
                       loading="lazy"
                       decoding="async"
-                      className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                     />
                   </Link>
                   

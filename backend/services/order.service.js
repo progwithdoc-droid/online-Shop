@@ -155,7 +155,25 @@ export const getOrders = async (userId, page = 1, limit = 10) => {
       .leftJoin(products, eq(orderItems.productId, products.id))
       .where(eq(orderItems.orderId, order.id));
 
-      return { ...order, items };
+      const itemsWithMedia = await Promise.all(
+        items.map(async (item) => {
+          if (!item.product) return item;
+          const media = await db.select()
+            .from(productMedia)
+            .where(eq(productMedia.productId, item.product.id))
+            .orderBy(productMedia.position)
+            .limit(1);
+          return {
+            ...item,
+            product: {
+              ...item.product,
+              thumbnail: media[0]?.url || null
+            }
+          };
+        })
+      );
+
+      return { ...order, items: itemsWithMedia };
     })
   );
 
@@ -193,6 +211,24 @@ export const getOrderById = async (orderId, userId, role) => {
   .leftJoin(products, eq(orderItems.productId, products.id))
   .where(eq(orderItems.orderId, orderId));
 
+  const itemsWithMedia = await Promise.all(
+    items.map(async (item) => {
+      if (!item.product) return item;
+      const media = await db.select()
+        .from(productMedia)
+        .where(eq(productMedia.productId, item.product.id))
+        .orderBy(productMedia.position)
+        .limit(1);
+      return {
+        ...item,
+        product: {
+          ...item.product,
+          thumbnail: media[0]?.url || null
+        }
+      };
+    })
+  );
+
   if (role !== 'ADMIN' && order.userId !== userId) {
     // If VENDOR, make sure they own at least one item
     const hasVendorItem = items.some(item => item.vendorId === userId);
@@ -215,7 +251,7 @@ export const getOrderById = async (orderId, userId, role) => {
     ...order,
     customer,
     address,
-    items: role === 'VENDOR' ? items.filter(item => item.vendorId === userId) : items,
+    items: role === 'VENDOR' ? itemsWithMedia.filter(item => item.vendorId === userId) : itemsWithMedia,
     returns: returnRequests
   };
 };

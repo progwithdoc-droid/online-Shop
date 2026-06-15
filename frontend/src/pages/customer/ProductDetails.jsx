@@ -162,7 +162,7 @@ export default function ProductDetails() {
         
         {/* Left column: Media Showcase */}
         <div className="space-y-4">
-          <div className="aspect-square w-full bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden relative shadow-sm">
+          <div className="aspect-square w-full bg-slate-100 dark:bg-dark-850 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden relative shadow-sm">
             {activeMedia?.type === 'VIDEO' ? (
               <video
                 src={activeMedia.url.startsWith('http') ? activeMedia.url : `${import.meta.env.VITE_API_URL.replace('/api', '')}${activeMedia.url}`}
@@ -176,7 +176,7 @@ export default function ProductDetails() {
                 alt={product.name}
                 loading="eager"
                 decoding="async"
-                className="w-full h-full object-contain p-4"
+                className="w-full h-full object-contain"
               />
             )}
           </div>
@@ -197,7 +197,7 @@ export default function ProductDetails() {
                     alt=""
                     loading="lazy"
                     decoding="async"
-                    className="w-full h-full object-contain p-1"
+                    className="w-full h-full object-contain"
                   />
                   {med.type === 'VIDEO' && (
                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white">

@@ -93,9 +93,9 @@ export default function Cart() {
           {items.map((item) => {
             const product = item.product;
             if (!product) return null;
-            const primaryMedia = product.media && product.media.length > 0
+            const primaryMedia = product.thumbnail || (product.media && product.media.length > 0
               ? product.media.find(m => m.type === 'IMAGE')?.url || product.media[0].url
-              : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200';
+              : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200');
 
             return (
               <div
@@ -104,13 +104,13 @@ export default function Cart() {
               >
                 {/* Left: Media and Info */}
                 <div className="flex items-center space-x-4">
-                  <div className="w-16 h-16 rounded-lg overflow-hidden bg-slate-50 dark:bg-dark-950 flex-shrink-0 border">
+                  <div className="w-20 h-20 rounded-xl overflow-hidden bg-slate-100 dark:bg-dark-850 flex-shrink-0">
                     <img
                       src={primaryMedia.startsWith('http') ? primaryMedia : `${import.meta.env.VITE_API_URL.replace('/api', '')}${primaryMedia}`}
                       alt={product.name}
                       loading="lazy"
                       decoding="async"
-                      className="w-full h-full object-contain p-1"
+                      className="w-full h-full object-contain"
                     />
                   </div>
                   <div>
