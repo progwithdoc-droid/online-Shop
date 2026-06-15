@@ -10,6 +10,7 @@ const router = Router();
 
 // Public routes
 router.get('/', productController.getProducts);
+router.get('/categories', productController.getCategories);
 router.get('/:id', productController.getProductById);
 router.get('/:id/reviews', productController.getProductReviews);
 

@@ -10,6 +10,7 @@ import { Search, SlidersHorizontal, Heart, ShoppingCart, Star, X } from 'lucide-
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState([{ name: 'All Categories', slug: '' }]);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
   const [sortBy, setSortBy] = useState('newest');
@@ -24,12 +25,17 @@ export default function Home() {
   const { isAuthenticated, role, user } = useAuthStore();
   const fetchCart = useCartStore((state) => state.fetchCart);
 
-  const categories = [
-    { name: 'All Categories', slug: '' },
-    { name: 'Electronics', slug: 'electronics' },
-    { name: 'Fashion', slug: 'fashion' },
-    { name: 'Home & Kitchen', slug: 'home-kitchen' }
-  ];
+  // Fetch categories from backend so the filter always matches what's in the DB
+  const fetchCategories = async () => {
+    try {
+      const res = await axiosInstance.get('/products/categories');
+      const dbCats = res.data.data || [];
+      setCategories([
+        { name: 'All Categories', slug: '' },
+        ...dbCats.map(c => ({ name: c.name, slug: c.slug }))
+      ]);
+    } catch (_) {}
+  };
 
   const fetchWishlist = async () => {
     if (isAuthenticated && role === 'USER') {
@@ -57,14 +63,19 @@ export default function Home() {
       };
       
       const response = await axiosInstance.get('/products', { params });
-      setProducts(response.data.data.products);
-      setTotalPages(response.data.data.totalPages || 1);
+      setProducts(response.data.data.products || []);
+      // pagination object: { total, page, limit, pages }
+      setTotalPages(response.data.data.pagination?.pages || response.data.data.totalPages || 1);
     } catch (err) {
       toast.error('Failed to load products');
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     fetchProducts();

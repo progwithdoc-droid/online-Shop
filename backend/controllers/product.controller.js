@@ -100,3 +100,12 @@ export const deleteProductMedia = async (req, res) => {
     return sendError(res, error.message, 400);
   }
 };
+
+export const getCategories = async (req, res) => {
+  try {
+    const result = await productService.getCategories();
+    return sendSuccess(res, result, 'Categories retrieved successfully');
+  } catch (error) {
+    return sendError(res, error.message, 500);
+  }
+};

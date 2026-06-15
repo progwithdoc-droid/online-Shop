@@ -28,7 +28,9 @@ export const getProducts = async (filters = {}) => {
   const offset = (parsedPage - 1) * parsedLimit;
 
   // Build filter conditions
-  const conditions = [eq(products.isDeleted, false), eq(products.isActive, true)];
+  // Only show products that have at least one media entry (uploaded image/video)
+  const hasMediaSubquery = sql`EXISTS (SELECT 1 FROM product_media pm WHERE pm.product_id = ${products.id})`;
+  const conditions = [eq(products.isDeleted, false), eq(products.isActive, true), hasMediaSubquery];
 
   if (vendorId) {
     conditions.push(eq(products.vendorId, vendorId));
@@ -419,4 +421,24 @@ export const getProductReviews = async (productId, page = 1, limit = 5) => {
       pages: Math.ceil(total / parsedLimit)
     }
   };
+};
+
+// Get all categories (with 5-minute cache)
+export const getCategories = async () => {
+  const cacheKey = 'categories:all';
+  const cached = await cache.get(cacheKey);
+  if (cached) return cached;
+
+  const result = await db
+    .select({
+      id: categories.id,
+      name: categories.name,
+      slug: categories.slug,
+      parentId: categories.parentId
+    })
+    .from(categories)
+    .orderBy(asc(categories.name));
+
+  await cache.set(cacheKey, result, 300);
+  return result;
 };
