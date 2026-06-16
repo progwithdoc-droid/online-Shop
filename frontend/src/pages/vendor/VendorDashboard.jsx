@@ -14,11 +14,15 @@ export default function VendorDashboard() {
   const fetchDashboardData = async () => {
     try {
       const resDash = await axiosInstance.get('/vendor/dashboard');
-      setData(resDash.data.data);
+      const dashboardData = resDash.data.data;
+      setData(dashboardData);
 
-      // Fetch sales trend for plotting
-      const resSales = await axiosInstance.get('/vendor/analytics/sales');
-      setSalesTrend(resSales.data.data || []);
+      // Extract and format monthly sales trend for charting
+      const trendData = dashboardData.revenueByMonth?.map(item => ({
+        date: item.month,
+        sales: item.revenue
+      })) || [];
+      setSalesTrend(trendData);
     } catch (err) {
       toast.error('Failed to load dashboard statistics');
     } finally {

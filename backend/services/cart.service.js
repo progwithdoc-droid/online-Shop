@@ -28,7 +28,8 @@ export const getCart = async (userId) => {
       compareAtPrice: products.compareAtPrice,
       stock: products.stock,
       isActive: products.isActive,
-      isDeleted: products.isDeleted
+      isDeleted: products.isDeleted,
+      vendorId: products.vendorId
     }
   })
   .from(cartItems)

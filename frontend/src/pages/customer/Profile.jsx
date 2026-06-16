@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../api/axios.js';
 import { useAuthStore } from '../../store/authStore.js';
 import toast from 'react-hot-toast';
-import { User, Key, MapPin, Check, Trash2, Camera, Loader2, Plus } from 'lucide-react';
+import { User, Key, MapPin, Check, Trash2, Camera, Loader2, Plus, ShoppingBag } from 'lucide-react';
+import { formatCurrency } from '../../utils/formatters.js';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -39,6 +40,10 @@ export default function Profile() {
   const [showNewAddressForm, setShowNewAddressForm] = useState(false);
   const [isAddressLoading, setIsAddressLoading] = useState(false);
 
+  // Purchased items state
+  const [purchasedItems, setPurchasedItems] = useState([]);
+  const [loadingPurchases, setLoadingPurchases] = useState(false);
+
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     resolver: zodResolver(addressSchema)
   });
@@ -55,11 +60,40 @@ export default function Profile() {
     }
   };
 
+  const fetchPurchases = async () => {
+    setLoadingPurchases(true);
+    try {
+      const response = await axiosInstance.get('/orders');
+      const ordersList = response.data.data?.orders || [];
+      const items = [];
+      ordersList.forEach(order => {
+        if (order.items) {
+          order.items.forEach(item => {
+            items.push({
+              ...item,
+              orderId: order.id,
+              orderStatus: order.status,
+              createdAt: order.createdAt,
+              paymentMethod: order.paymentMethod,
+              paymentStatus: order.paymentStatus
+            });
+          });
+        }
+      });
+      setPurchasedItems(items);
+    } catch (err) {
+      console.error('Failed to load purchases', err);
+    } finally {
+      setLoadingPurchases(false);
+    }
+  };
+
   useEffect(() => {
     setName(user?.name || '');
     setEmail(user?.email || '');
     if (user?.role === 'USER') {
       fetchAddresses();
+      fetchPurchases();
     }
   }, [user]);
 
@@ -388,6 +422,72 @@ export default function Profile() {
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Purchased Items Section */}
+          {user?.role === 'USER' && (
+            <div className="p-6 bg-white dark:bg-dark-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-4 shadow-sm">
+              <h2 className="heading-display text-lg font-bold flex items-center space-x-2">
+                <ShoppingBag className="w-5 h-5 text-brand-600" />
+                <span>Things Bought ({purchasedItems.length})</span>
+              </h2>
+
+              {loadingPurchases ? (
+                <div className="flex justify-center py-4">
+                  <Loader2 className="w-6 h-6 animate-spin text-brand-600" />
+                </div>
+              ) : purchasedItems.length === 0 ? (
+                <p className="text-xs text-slate-400 italic">You haven't bought anything yet. Explore the shop to make your first purchase!</p>
+              ) : (
+                <div className="space-y-4 max-h-[400px] overflow-y-auto pr-1">
+                  {purchasedItems.map((item, idx) => {
+                    const product = item.product;
+                    if (!product) return null;
+                    const primaryMedia = product.thumbnail || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100';
+                    return (
+                      <div
+                        key={`${item.id}-${idx}`}
+                        className="flex justify-between items-center p-3 border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-50 dark:hover:bg-dark-850 transition-all gap-4"
+                      >
+                        <div className="flex items-center space-x-3 min-w-0">
+                          <div className="w-12 h-12 rounded-lg overflow-hidden bg-slate-100 dark:bg-dark-850 flex-shrink-0 flex items-center justify-center">
+                            <img
+                              src={primaryMedia.startsWith('http') ? primaryMedia : `${import.meta.env.VITE_API_URL.replace('/api', '')}${primaryMedia}`}
+                              alt={product.name}
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="font-semibold text-xs text-slate-800 dark:text-slate-100 truncate">
+                              {product.name}
+                            </h4>
+                            <div className="flex items-center space-x-2 text-[10px] text-slate-400 mt-0.5">
+                              <span>Qty: <span className="font-bold">{item.quantity}</span></span>
+                              <span>•</span>
+                              <span>Price: <span className="font-semibold">{formatCurrency(parseFloat(item.priceAtPurchase))}</span></span>
+                              <span>•</span>
+                              <span>Date: <span>{new Date(item.createdAt).toLocaleDateString()}</span></span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="text-right shrink-0">
+                          <span className={`inline-block px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                            item.orderStatus === 'DELIVERED'
+                              ? 'bg-success-bg text-success-text border border-success-text/20'
+                              : item.orderStatus === 'CANCELLED'
+                              ? 'bg-danger-bg text-danger-text border border-danger-text/20'
+                              : 'bg-warning-bg text-warning-text border border-warning-text/20'
+                          }`}>
+                            {item.orderStatus}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>

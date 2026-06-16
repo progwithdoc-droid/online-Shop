@@ -1,6 +1,6 @@
 import { eq, and, desc, sql } from 'drizzle-orm';
 import { db } from '../config/db.js';
-import { orders, orderItems, products, cartItems, carts, addresses, returns, users } from '../models/schema.js';
+import { orders, orderItems, products, cartItems, carts, addresses, returns, users, productMedia } from '../models/schema.js';
 import { getCart, clearCart } from './cart.service.js';
 import * as trackingService from './tracking.service.js';
 import * as notificationService from './notification.service.js';
@@ -119,6 +119,22 @@ export const createOrder = async (userId, { addressId, paymentMethod }) => {
     { orderId: createdOrder.id }
   );
 
+  // Send notification to each vendor involved in this order
+  const uniqueVendorIds = [...new Set(cart.items.map(item => item.product.vendorId).filter(Boolean))];
+  for (const vId of uniqueVendorIds) {
+    try {
+      await notificationService.create(
+        vId,
+        'NEW_ORDER',
+        'New Order Received',
+        `You have received a new order #${createdOrder.id.substring(0, 8)} for your products`,
+        { orderId: createdOrder.id }
+      );
+    } catch (err) {
+      console.error(`Failed to notify vendor ${vId}:`, err.message);
+    }
+  }
+
   // Clear product details cache for ordered items (stock updated)
   for (const item of cart.items) {
     await cache.del(`products:detail:${item.product.id}`);
@@ -132,19 +148,42 @@ export const getOrders = async (userId, page = 1, limit = 10) => {
   const parsedLimit = parseInt(limit) || 10;
   const offset = (parsedPage - 1) * parsedLimit;
 
-  const userOrders = await db.select()
-    .from(orders)
-    .where(eq(orders.userId, userId))
-    .orderBy(desc(orders.createdAt))
-    .limit(parsedLimit)
-    .offset(offset);
+  const userOrders = await db.select({
+    id: orders.id,
+    userId: orders.userId,
+    addressId: orders.addressId,
+    status: orders.status,
+    totalAmount: orders.totalAmount,
+    paymentStatus: orders.paymentStatus,
+    paymentMethod: orders.paymentMethod,
+    createdAt: orders.createdAt,
+    updatedAt: orders.updatedAt,
+    address: {
+      id: addresses.id,
+      label: addresses.label,
+      line1: addresses.line1,
+      line2: addresses.line2,
+      city: addresses.city,
+      state: addresses.state,
+      pincode: addresses.pincode,
+      country: addresses.country
+    }
+  })
+  .from(orders)
+  .leftJoin(addresses, eq(orders.addressId, addresses.id))
+  .where(eq(orders.userId, userId))
+  .orderBy(desc(orders.createdAt))
+  .limit(parsedLimit)
+  .offset(offset);
 
   const ordersWithItems = await Promise.all(
     userOrders.map(async (order) => {
       const items = await db.select({
         id: orderItems.id,
         quantity: orderItems.quantity,
+        price: orderItems.priceAtPurchase,
         priceAtPurchase: orderItems.priceAtPurchase,
+        returnStatus: returns.status,
         product: {
           id: products.id,
           name: products.name,
@@ -153,6 +192,7 @@ export const getOrders = async (userId, page = 1, limit = 10) => {
       })
       .from(orderItems)
       .leftJoin(products, eq(orderItems.productId, products.id))
+      .leftJoin(returns, eq(orderItems.id, returns.orderItemId))
       .where(eq(orderItems.orderId, order.id));
 
       const itemsWithMedia = await Promise.all(
@@ -199,6 +239,7 @@ export const getOrderById = async (orderId, userId, role) => {
   const items = await db.select({
     id: orderItems.id,
     quantity: orderItems.quantity,
+    price: orderItems.priceAtPurchase,
     priceAtPurchase: orderItems.priceAtPurchase,
     vendorId: orderItems.vendorId,
     product: {
@@ -384,6 +425,7 @@ export const getVendorOrders = async (vendorId) => {
       const items = await db.select({
         id: orderItems.id,
         quantity: orderItems.quantity,
+        price: orderItems.priceAtPurchase,
         priceAtPurchase: orderItems.priceAtPurchase,
         product: {
           id: products.id,
@@ -408,7 +450,30 @@ export const updateVendorOrderStatus = async (vendorId, orderId, status) => {
     throw new Error('Order does not contain products from this vendor');
   }
 
-  const [updated] = await db.update(orders).set({ status, updatedAt: new Date() }).where(eq(orders.id, orderId)).returning();
+  const [order] = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
+  if (!order) {
+    throw new Error('Order not found');
+  }
+
+  const updateData = { status, updatedAt: new Date() };
+  if (status === 'DELIVERED' && order.paymentMethod === 'COD') {
+    updateData.paymentStatus = 'PAID';
+  }
+
+  const [updated] = await db.update(orders).set(updateData).where(eq(orders.id, orderId)).returning();
+
+  // Log tracking event
+  await trackingService.addEvent(orderId, status, `Order status updated to ${status} by vendor`, vendorId);
+
+  // Send notification to customer
+  await notificationService.create(
+    order.userId,
+    'ORDER_STATUS_CHANGED',
+    'Order Status Update',
+    `Your order #${orderId.substring(0, 8)} status is now ${status}`,
+    { orderId }
+  );
+
   return updated;
 };
 
@@ -420,6 +485,7 @@ export const getAdminOrders = async () => {
       const items = await db.select({
         id: orderItems.id,
         quantity: orderItems.quantity,
+        price: orderItems.priceAtPurchase,
         priceAtPurchase: orderItems.priceAtPurchase,
         product: {
           id: products.id,
@@ -440,6 +506,29 @@ export const getAdminOrders = async () => {
 };
 
 export const updateAdminOrderStatus = async (orderId, status) => {
-  const [updated] = await db.update(orders).set({ status, updatedAt: new Date() }).where(eq(orders.id, orderId)).returning();
+  const [order] = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
+  if (!order) {
+    throw new Error('Order not found');
+  }
+
+  const updateData = { status, updatedAt: new Date() };
+  if (status === 'DELIVERED' && order.paymentMethod === 'COD') {
+    updateData.paymentStatus = 'PAID';
+  }
+
+  const [updated] = await db.update(orders).set(updateData).where(eq(orders.id, orderId)).returning();
+
+  // Log tracking event
+  await trackingService.addEvent(orderId, status, `Order status updated to ${status} by administrator`, order.userId);
+
+  // Send notification to customer
+  await notificationService.create(
+    order.userId,
+    'ORDER_STATUS_CHANGED',
+    'Order Status Update',
+    `Your order #${orderId.substring(0, 8)} status is now ${status}`,
+    { orderId }
+  );
+
   return updated;
 };
