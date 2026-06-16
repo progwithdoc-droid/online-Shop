@@ -1,143 +1,76 @@
-﻿# SparkIT- Ecommerce Application
+﻿# SparkIT — Ecommerce Platform
 
-A full-stack ecommerce application built with a Node.js backend and a React frontend. The project demonstrates a production-oriented architecture featuring authentication, role-based access control, product catalog management, shopping cart workflows, order processing, complaint handling, and vendor administration.
+This repository contains a full-stack ecommerce reference implementation with a Node.js backend and a React frontend. It demonstrates a production-oriented architecture that includes authentication, role-based access control, catalog and order management, media uploads, and administrative workflows.
 
-## Key Features
+## Contents
 
-- Modular backend architecture with separate controllers, services, middleware, and routes
-- RESTful API built on Express and Drizzle ORM for PostgreSQL/NeonDB
-- Role-based authentication and authorization for customers, vendors, and administrators
-- File upload integration using Cloudinary for product media management
-- Frontend built with React, Vite, Tailwind CSS, and React Router
-- Client-side state management with React Query and Zustand
-- Validation using Zod for request payloads and form handling
+- `backend/` — API server with database integration, business logic, and middleware.
+- `frontend/` — React application built with Vite, Tailwind CSS, and client-side state management.
+- `images/` — sample product media used by the frontend and seed data.
 
-## Architecture Overview
+## Highlights
 
-The repository is divided into two primary folders:
-
-- `backend`: Node.js API server and database integration
-- `frontend`: React application with role-based route protection and dashboard views
-
-The backend handles all core business logic, authentication, data persistence, and third-party integrations. The frontend consumes the API and provides separate interfaces for customers, vendors, and administrators.
-
-## Technology Stack
-
-- Backend: Node.js, Express 5, Drizzle ORM, PostgreSQL, Cloudinary, JWT
-- Frontend: React, Vite, Tailwind CSS, React Router, React Hook Form, Recharts
-- Utilities: Axios, Zod, bcryptjs, dotenv, helmet, cors, compression
-
-## Repository Layout
-
-- `backend/app.js` / `backend/server.js` - API application entry points
-- `backend/controllers/` - request handlers for each domain
-- `backend/services/` - business logic and data operations
-- `backend/routes/` - route definitions for public and protected endpoints
-- `backend/middleware/` - authentication, role checks, validation, and uploads
-- `backend/models/schema.js` - schema definitions for Drizzle ORM
-- `frontend/src/` - React application source files
-- `frontend/src/pages/` - page views organized by user roles
-- `frontend/src/components/` - reusable UI and layout components
-- `frontend/src/api/axios.js` - configured Axios instance for API requests
-- `frontend/src/store/` - client-side state management stores
+- Role-based access control for customers, vendors, and administrators.
+- RESTful API built with Express and Drizzle ORM (PostgreSQL compatible).
+- Cloudinary integration for product media uploads.
+- Frontend with Vite, React, Tailwind CSS, React Router, Zustand, and React Query.
+- Request validation with Zod and centralized API error handling.
 
 ## Prerequisites
 
 - Node.js 18 or later
 - npm 10 or later
 - PostgreSQL compatible database or NeonDB
-- Cloudinary account for media uploads
+- Cloudinary account for media uploads (optional for local testing)
 
-## Setup and Installation
+## Quickstart
 
-### Backend
+1. Backend
 
-1. Open a terminal in `project/backend`
-2. Install dependencies:
-   ```bash
+   ```powershell
+   cd project/backend
    npm install
-   ```
-3. Copy environment template:
-   ```bash
    cp .env.example .env
-   ```
-4. Update `.env` with your values, including `DATABASE_URL`, `JWT_SECRET`, and Cloudinary credentials.
-5. Start the backend in development mode:
-   ```bash
+   # edit .env to set DATABASE_URL, JWT_SECRET, REFRESH_TOKEN_SECRET, CLOUDINARY_*, CLIENT_URL
    npm run dev
    ```
 
-### Frontend
+2. Frontend
 
-1. Open a terminal in `project/frontend`
-2. Install dependencies:
-   ```bash
+   ```powershell
+   cd project/frontend
    npm install
-   ```
-3. Copy environment template:
-   ```bash
    cp .env.sample .env
-   ```
-4. Update `.env` if necessary. The default points to `http://localhost:5000/api`.
-5. Start the frontend development server:
-   ```bash
+   # edit .env to set VITE_API_URL if required
    npm run dev
    ```
 
 ## Environment Variables
 
-### Backend
+- Backend: `PORT`, `NODE_ENV`, `DATABASE_URL`, `JWT_SECRET`, `REFRESH_TOKEN_SECRET`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `CLIENT_URL`
+- Frontend: `VITE_API_URL`
 
-- `PORT` - backend server port
-- `NODE_ENV` - application environment
-- `DATABASE_URL` - PostgreSQL database connection string
-- `JWT_SECRET` - secret key for signing access tokens
-- `JWT_EXPIRES_IN` - access token expiration
-- `REFRESH_TOKEN_SECRET` - secret for refresh tokens
-- `CLOUDINARY_CLOUD_NAME` - Cloudinary cloud name
-- `CLOUDINARY_API_KEY` - Cloudinary API key
-- `CLOUDINARY_API_SECRET` - Cloudinary API secret
-- `CLIENT_URL` - allowed frontend URL for CORS
+## Common Scripts
 
-### Frontend
+- Backend: `npm run dev`, `npm start`, `npm run seed`, `npm run db:generate`, `npm run db:push`
+- Frontend: `npm run dev`, `npm run build`, `npm run preview`, `npm run lint`
 
-- `VITE_API_URL` - base URL for API requests
+## Development Guidance
 
-## Development Commands
+- Keep secret values out of source control using local `.env` files.
+- Use clear, stable branch names and add descriptive pull request summaries.
+- Run linters and validations before merging changes.
 
-### Backend
+## Deployment Notes
 
-- `npm run dev` - start the backend with Nodemon
-- `npm start` - run the backend in production mode
-- `npm run seed` - populate the database with seed data
-- `npm run db:generate` - generate Drizzle migrations/schema
-- `npm run db:push` - push schema changes to the database
-- `npm run db:studio` - open Drizzle Studio
+- Build the frontend and deploy static assets to a CDN or web server.
+- Deploy the backend to a Node-compatible environment and use secure environment management.
+- Enable HTTPS and restrict CORS to trusted origins.
 
-### Frontend
+## Contributing
 
-- `npm run dev` - start Vite development server
-- `npm run build` - build production assets
-- `npm run preview` - preview the production build locally
-- `npm run lint` - run ESLint checks
+Contributions are welcome. Follow the existing project structure, document configuration changes, and keep new features isolated.
 
-## Notes and Best Practices
+## License and Contact
 
-- Keep secret keys and credentials out of source control by using `.env` files only in local development.
-- Use strong, unique values for JWT secrets and avoid short or predictable strings.
-- For production deployments, configure HTTPS, secure CORS origins, and database connection pooling.
-- Validate API requests consistently in the backend and handle errors centrally for predictable responses.
-
-## Extending the Project
-
-This project is designed for extensibility and can be enhanced with:
-
-- payment gateway support (e.g., Stripe or Razorpay)
-- email notifications and OTP workflows
-- Redis caching or session storage
-- multi-tenancy for vendor isolation
-- analytics dashboards and sales reporting
-
-## Contact
-
-For implementation details, refer to the source files under `backend/` and `frontend/src/`, or use the existing route and service structure as a reference for adding new features.
+This repository is provided as a reference implementation. Refer to the project maintainers for licensing and support details.
