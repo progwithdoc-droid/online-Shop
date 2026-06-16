@@ -6,7 +6,7 @@ This repository contains a full-stack ecommerce reference implementation with a 
 
 - `backend/` — API server with database integration, business logic, and middleware.
 - `frontend/` — React application built with Vite, Tailwind CSS, and client-side state management.
-- `images/` — sample product media used by the frontend and seed data.
+<!-- - `images/` — sample product media used by the frontend and seed data. -->
 
 ## Highlights
 
